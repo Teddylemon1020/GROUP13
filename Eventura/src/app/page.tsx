@@ -2,5 +2,5 @@
 import { redirect } from "next/navigation";
 
 export default function Page() {
-  redirect("/home"); // Redirects to /home
+  redirect("/signup"); // Redirects to /home
 }
