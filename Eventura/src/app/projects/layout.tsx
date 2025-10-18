@@ -1,7 +1,7 @@
 "use client";
 import { SessionProvider } from "next-auth/react";
 
-export default function HomeLayout({
+export default function ProjectsLayout({
   children,
 }: {
   children: React.ReactNode;
