@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import dbConnect from '@/utils/mongodb';
 import Project from '@/models/projectmodel';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
 // GET all projects for the authenticated user
 export async function GET() {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
 
     if (!session || !session.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -31,7 +32,7 @@ export async function GET() {
 // POST create a new project
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
 
     if (!session || !session.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
