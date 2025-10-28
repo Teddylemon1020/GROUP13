@@ -6,6 +6,8 @@ export interface ITask {
   task: string;
   assignedTo: string;
   deadline: Date | null;
+  status: 'todo' | 'in-progress' | 'done' | '';
+  priority: 'high' | 'medium' | 'low' | '';
 }
 
 // Subgroup interface
@@ -36,7 +38,7 @@ const TaskSchema = new Schema({
   },
   task: {
     type: String,
-    required: true,
+    required: false,
     default: '',
   },
   assignedTo: {
@@ -46,6 +48,16 @@ const TaskSchema = new Schema({
   deadline: {
     type: Date,
     default: null,
+  },
+  status: {
+    type: String,
+    enum: ['todo', 'in-progress', 'done', ''],
+    default: '',
+  },
+  priority: {
+    type: String,
+    enum: ['high', 'medium', 'low', ''],
+    default: '',
   },
 });
 

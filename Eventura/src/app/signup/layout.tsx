@@ -1,14 +1,10 @@
-// src/app/home/layout.tsx
-import type { ReactNode } from "react";
-// import Header from "@/components/header/Header";
-// can be used if you have a common header for many pages
+"use client";
+import { SessionProvider } from "next-auth/react";
 
-export default function HomeLayout({ children }: { children: ReactNode }) {
-  return (
-    <div>
-      {/* <Header /> */}
-      {/* Uncomment the <Header /> component to use it */}
-      {children}
-    </div>
-  );
+export default function SignupLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return <SessionProvider>{children}</SessionProvider>;
 }

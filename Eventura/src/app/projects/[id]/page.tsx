@@ -1,14 +1,27 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { FiPlus, FiTrash2, FiEdit2, FiSave, FiX } from "react-icons/fi";
+import {
+  FiPlus,
+  FiTrash2,
+  FiEdit2,
+  FiSave,
+  FiX,
+  FiFileText,
+  FiUser,
+  FiCalendar,
+  FiCheckCircle,
+  FiAlertCircle,
+} from "react-icons/fi";
 
 interface ITask {
   id: string;
   task: string;
   assignedTo: string;
   deadline: Date | null;
+  status: "todo" | "in-progress" | "done" | "";
+  priority: "high" | "medium" | "low" | "";
 }
 
 interface ISubgroup {
@@ -26,6 +39,153 @@ interface IProject {
   subgroups: ISubgroup[];
   createdAt: Date;
   updatedAt: Date;
+}
+
+// Status Dropdown Component
+function StatusDropdown({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (value: "todo" | "in-progress" | "done" | "") => void;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const statusOptions = [
+    { value: "", label: "Empty", color: "bg-gray-100 text-gray-600" },
+    { value: "todo", label: "To Do", color: "bg-gray-100 text-gray-700" },
+    {
+      value: "in-progress",
+      label: "In Progress",
+      color: "bg-blue-100 text-blue-700",
+    },
+    { value: "done", label: "Done", color: "bg-green-100 text-green-700" },
+  ];
+
+  const selectedOption = statusOptions.find((opt) => opt.value === value) || statusOptions[0];
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={`px-3 py-1 rounded-md text-xs font-medium transition-all hover:opacity-80 ${
+          selectedOption.color
+        } ${!value && "text-gray-400"}`}
+      >
+        {selectedOption.label}
+      </button>
+      {isOpen && (
+        <div className="absolute z-10 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 min-w-[140px]">
+          {statusOptions.map((option) => (
+            <button
+              key={option.value}
+              onClick={() => {
+                onChange(option.value as any);
+                setIsOpen(false);
+              }}
+              className="w-full text-left px-3 py-2 hover:bg-gray-50 transition-colors"
+            >
+              <span
+                className={`px-2 py-1 rounded-md text-xs font-medium ${option.color}`}
+              >
+                {option.label}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Priority Dropdown Component
+function PriorityDropdown({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (value: "high" | "medium" | "low" | "") => void;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const priorityOptions = [
+    { value: "", label: "Empty", color: "bg-gray-100 text-gray-600", icon: "○" },
+    { value: "high", label: "High", color: "bg-red-100 text-red-700", icon: "●" },
+    {
+      value: "medium",
+      label: "Medium",
+      color: "bg-yellow-100 text-yellow-700",
+      icon: "●",
+    },
+    { value: "low", label: "Low", color: "bg-blue-100 text-blue-700", icon: "●" },
+  ];
+
+  const selectedOption = priorityOptions.find((opt) => opt.value === value) || priorityOptions[0];
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={`px-3 py-1 rounded-md text-xs font-medium transition-all hover:opacity-80 flex items-center gap-1 ${
+          selectedOption.color
+        } ${!value && "text-gray-400"}`}
+      >
+        <span>{selectedOption.icon}</span>
+        <span>{selectedOption.label}</span>
+      </button>
+      {isOpen && (
+        <div className="absolute z-10 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 min-w-[130px]">
+          {priorityOptions.map((option) => (
+            <button
+              key={option.value}
+              onClick={() => {
+                onChange(option.value as any);
+                setIsOpen(false);
+              }}
+              className="w-full text-left px-3 py-2 hover:bg-gray-50 transition-colors"
+            >
+              <span
+                className={`px-2 py-1 rounded-md text-xs font-medium flex items-center gap-1 ${option.color}`}
+              >
+                <span>{option.icon}</span>
+                <span>{option.label}</span>
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function ProjectDetailPage() {
@@ -100,6 +260,8 @@ export default function ProjectDetailPage() {
           task: "",
           assignedTo: "",
           deadline: null,
+          status: "",
+          priority: "",
         },
       ],
       createdAt: new Date(),
@@ -140,6 +302,8 @@ export default function ProjectDetailPage() {
       task: "",
       assignedTo: "",
       deadline: null,
+      status: "",
+      priority: "",
     };
 
     const updatedSubgroups = project.subgroups.map((sg) =>
@@ -320,30 +484,51 @@ export default function ProjectDetailPage() {
                 </button>
               </div>
 
-              {/* Table */}
-              <div className="overflow-x-auto">
+              {/* Notion-Style Table */}
+              <div className="overflow-x-auto rounded-lg border border-gray-200">
                 <table className="w-full border-collapse">
                   <thead>
-                    <tr className="bg-gray-50 border-b-2 border-gray-200">
-                      <th className="text-left p-3 font-semibold text-gray-700">
-                        Task
+                    <tr className="bg-gray-50 border-b border-gray-200">
+                      <th className="text-left p-3 font-medium text-gray-600 text-sm">
+                        <div className="flex items-center gap-2">
+                          <FiFileText className="text-gray-400" size={14} />
+                          <span>Task</span>
+                        </div>
                       </th>
-                      <th className="text-left p-3 font-semibold text-gray-700">
-                        Assigned To
+                      <th className="text-left p-3 font-medium text-gray-600 text-sm w-40">
+                        <div className="flex items-center gap-2">
+                          <FiCheckCircle className="text-gray-400" size={14} />
+                          <span>Status</span>
+                        </div>
                       </th>
-                      <th className="text-left p-3 font-semibold text-gray-700">
-                        Deadline
+                      <th className="text-left p-3 font-medium text-gray-600 text-sm w-36">
+                        <div className="flex items-center gap-2">
+                          <FiAlertCircle className="text-gray-400" size={14} />
+                          <span>Priority</span>
+                        </div>
                       </th>
-                      <th className="w-20"></th>
+                      <th className="text-left p-3 font-medium text-gray-600 text-sm w-44">
+                        <div className="flex items-center gap-2">
+                          <FiUser className="text-gray-400" size={14} />
+                          <span>Assigned To</span>
+                        </div>
+                      </th>
+                      <th className="text-left p-3 font-medium text-gray-600 text-sm w-40">
+                        <div className="flex items-center gap-2">
+                          <FiCalendar className="text-gray-400" size={14} />
+                          <span>Deadline</span>
+                        </div>
+                      </th>
+                      <th className="w-12"></th>
                     </tr>
                   </thead>
                   <tbody>
                     {subgroup.tasks.map((task) => (
                       <tr
                         key={task.id}
-                        className="border-b border-gray-100 hover:bg-gray-50"
+                        className="border-b border-gray-100 hover:bg-gray-50 transition-colors group"
                       >
-                        <td className="p-3">
+                        <td className="p-2">
                           <input
                             type="text"
                             value={task.task}
@@ -355,11 +540,37 @@ export default function ProjectDetailPage() {
                                 e.target.value
                               )
                             }
-                            placeholder="Enter task..."
-                            className="w-full bg-transparent border-none outline-none focus:bg-white focus:shadow-sm focus:px-2 focus:py-1 rounded"
+                            placeholder="Empty"
+                            className="w-full bg-transparent border-none outline-none px-2 py-1.5 rounded hover:bg-white hover:shadow-sm focus:bg-white focus:shadow-sm transition-all text-sm"
                           />
                         </td>
-                        <td className="p-3">
+                        <td className="p-2">
+                          <StatusDropdown
+                            value={task.status}
+                            onChange={(value) =>
+                              handleUpdateTask(
+                                subgroup.id,
+                                task.id,
+                                "status",
+                                value
+                              )
+                            }
+                          />
+                        </td>
+                        <td className="p-2">
+                          <PriorityDropdown
+                            value={task.priority}
+                            onChange={(value) =>
+                              handleUpdateTask(
+                                subgroup.id,
+                                task.id,
+                                "priority",
+                                value
+                              )
+                            }
+                          />
+                        </td>
+                        <td className="p-2">
                           <input
                             type="text"
                             value={task.assignedTo}
@@ -371,11 +582,11 @@ export default function ProjectDetailPage() {
                                 e.target.value
                               )
                             }
-                            placeholder="Assign to..."
-                            className="w-full bg-transparent border-none outline-none focus:bg-white focus:shadow-sm focus:px-2 focus:py-1 rounded"
+                            placeholder="Empty"
+                            className="w-full bg-transparent border-none outline-none px-2 py-1.5 rounded hover:bg-white hover:shadow-sm focus:bg-white focus:shadow-sm transition-all text-sm"
                           />
                         </td>
-                        <td className="p-3">
+                        <td className="p-2">
                           <input
                             type="date"
                             value={
@@ -393,17 +604,18 @@ export default function ProjectDetailPage() {
                                 e.target.value ? new Date(e.target.value) : null
                               )
                             }
-                            className="w-full bg-transparent border-none outline-none focus:bg-white focus:shadow-sm focus:px-2 focus:py-1 rounded"
+                            className="w-full bg-transparent border-none outline-none px-2 py-1.5 rounded hover:bg-white hover:shadow-sm focus:bg-white focus:shadow-sm transition-all text-sm text-gray-700"
                           />
                         </td>
-                        <td className="p-3 text-center">
+                        <td className="p-2 text-center">
                           <button
                             onClick={() =>
                               handleDeleteTask(subgroup.id, task.id)
                             }
-                            className="p-1 text-red-600 hover:bg-red-50 rounded"
+                            className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded opacity-0 group-hover:opacity-100 transition-all"
+                            title="Delete task"
                           >
-                            <FiTrash2 size={16} />
+                            <FiTrash2 size={14} />
                           </button>
                         </td>
                       </tr>
