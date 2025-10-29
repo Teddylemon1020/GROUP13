@@ -511,57 +511,57 @@ export default function ProjectDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] p-6 relative">
+    <div className="min-h-screen bg-[#0a0a0a] p-3 sm:p-6 relative">
       {/* Gradient background effect */}
       <div className="absolute top-0 left-0 right-0 h-96 bg-gradient-to-b from-indigo-900/10 via-transparent to-transparent pointer-events-none"></div>
 
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
-        <div className="mb-10">
+        <div className="mb-6 sm:mb-10">
           <button
             onClick={() => router.push("/home")}
-            className="text-gray-400 hover:text-indigo-400 mb-6 flex items-center gap-2 transition-colors group"
+            className="text-gray-400 hover:text-indigo-400 mb-4 sm:mb-6 flex items-center gap-2 transition-colors group text-sm sm:text-base"
           >
             <span className="group-hover:-translate-x-1 transition-transform">←</span>
             <span>Back to Projects</span>
           </button>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             {editingTitle ? (
-              <div className="flex items-center gap-3 flex-1">
+              <div className="flex items-center gap-2 sm:gap-3 flex-1">
                 <input
                   type="text"
                   value={projectName}
                   onChange={(e) => setProjectName(e.target.value)}
-                  className="text-5xl font-bold border-b-2 border-indigo-500 bg-transparent outline-none flex-1 text-gray-200"
+                  className="text-2xl sm:text-4xl md:text-5xl font-bold border-b-2 border-indigo-500 bg-transparent outline-none flex-1 text-gray-200"
                   autoFocus
                 />
                 <button
                   onClick={handleSaveProjectName}
-                  className="p-3 text-green-400 hover:bg-green-500/10 border border-green-500/30 rounded-xl transition-all hover:border-green-500/50"
+                  className="p-2 sm:p-3 text-green-400 hover:bg-green-500/10 border border-green-500/30 rounded-xl transition-all hover:border-green-500/50"
                 >
-                  <FiSave size={22} />
+                  <FiSave size={18} className="sm:w-[22px] sm:h-[22px]" />
                 </button>
                 <button
                   onClick={() => {
                     setProjectName(project.name);
                     setEditingTitle(false);
                   }}
-                  className="p-3 text-red-400 hover:bg-red-500/10 border border-red-500/30 rounded-xl transition-all hover:border-red-500/50"
+                  className="p-2 sm:p-3 text-red-400 hover:bg-red-500/10 border border-red-500/30 rounded-xl transition-all hover:border-red-500/50"
                 >
-                  <FiX size={22} />
+                  <FiX size={18} className="sm:w-[22px] sm:h-[22px]" />
                 </button>
               </div>
             ) : (
-              <div className="flex items-center gap-4">
-                <h1 className="text-5xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+              <div className="flex items-center gap-2 sm:gap-4">
+                <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
                   {project.name}
                 </h1>
                 <button
                   onClick={() => setEditingTitle(true)}
-                  className="p-3 text-gray-400 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-xl transition-all"
+                  className="p-2 sm:p-3 text-gray-400 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-xl transition-all"
                 >
-                  <FiEdit2 size={22} />
+                  <FiEdit2 size={18} className="sm:w-[22px] sm:h-[22px]" />
                 </button>
               </div>
             )}
@@ -573,39 +573,39 @@ export default function ProjectDetailPage() {
         </div>
 
         {/* Subgroups */}
-        <div className="space-y-8">
+        <div className="space-y-4 sm:space-y-8">
           {project.subgroups.map((subgroup) => (
             <div
               key={subgroup.id}
-              className="bg-[#161616] rounded-2xl shadow-2xl border border-[#2a2a2a] p-8 hover:border-indigo-500/30 transition-all"
+              className="bg-[#161616] rounded-xl sm:rounded-2xl shadow-2xl border border-[#2a2a2a] p-4 sm:p-8 hover:border-indigo-500/30 transition-all"
             >
               {/* Subgroup Header */}
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center justify-between mb-4 sm:mb-6 gap-2">
                 {editingSubgroupId === subgroup.id ? (
-                  <div className="flex items-center gap-3 flex-1">
+                  <div className="flex items-center gap-2 sm:gap-3 flex-1">
                     <input
                       type="text"
                       value={editingSubgroupTitle}
                       onChange={(e) => setEditingSubgroupTitle(e.target.value)}
-                      className="text-3xl font-bold border-b-2 border-indigo-500 bg-transparent outline-none text-gray-200"
+                      className="text-xl sm:text-2xl md:text-3xl font-bold border-b-2 border-indigo-500 bg-transparent outline-none text-gray-200"
                       autoFocus
                     />
                     <button
                       onClick={() => handleSaveSubgroupTitle(subgroup.id)}
-                      className="p-2 text-green-400 hover:bg-green-500/10 border border-green-500/30 rounded-lg transition-all"
+                      className="p-2 text-green-400 hover:bg-green-500/10 border border-green-500/30 rounded-lg transition-all shrink-0"
                     >
-                      <FiSave size={20} />
+                      <FiSave size={16} className="sm:w-5 sm:h-5" />
                     </button>
                     <button
                       onClick={() => setEditingSubgroupId(null)}
-                      className="p-2 text-red-400 hover:bg-red-500/10 border border-red-500/30 rounded-lg transition-all"
+                      className="p-2 text-red-400 hover:bg-red-500/10 border border-red-500/30 rounded-lg transition-all shrink-0"
                     >
-                      <FiX size={20} />
+                      <FiX size={16} className="sm:w-5 sm:h-5" />
                     </button>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-3">
-                    <h2 className="text-3xl font-bold text-gray-200">
+                  <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-200 truncate">
                       {subgroup.title}
                     </h2>
                     <button
@@ -613,63 +613,71 @@ export default function ProjectDetailPage() {
                         setEditingSubgroupId(subgroup.id);
                         setEditingSubgroupTitle(subgroup.title);
                       }}
-                      className="p-2 text-gray-400 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all"
+                      className="p-2 text-gray-400 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all shrink-0"
                     >
-                      <FiEdit2 size={18} />
+                      <FiEdit2 size={16} className="sm:w-[18px] sm:h-[18px]" />
                     </button>
                   </div>
                 )}
 
                 <button
                   onClick={() => handleDeleteSubgroup(subgroup.id)}
-                  className="p-3 text-red-400 hover:bg-red-500/10 border border-red-500/30 rounded-xl transition-all hover:border-red-500/50"
+                  className="p-2 sm:p-3 text-red-400 hover:bg-red-500/10 border border-red-500/30 rounded-xl transition-all hover:border-red-500/50 shrink-0"
                 >
-                  <FiTrash2 size={20} />
+                  <FiTrash2 size={16} className="sm:w-5 sm:h-5" />
                 </button>
               </div>
 
+              {/* Scroll hint for mobile */}
+              <div className="md:hidden text-center text-xs text-gray-500 mb-2 flex items-center justify-center gap-1">
+                <span>←</span>
+                <span>Scroll to see all columns</span>
+                <span>→</span>
+              </div>
+
               {/* Notion-Style Table */}
-              <div className="overflow-x-auto rounded-xl border border-[#2a2a2a] bg-[#1a1a1a]">
-                <table className="w-full border-collapse">
+              <div className="overflow-x-auto rounded-xl border border-[#2a2a2a] bg-[#1a1a1a] -mx-4 sm:mx-0">
+                <div className="min-w-[900px]">
+                  <table className="w-full border-collapse">
                   <thead>
                     <tr className="bg-[#1f1f1f] border-b border-[#2a2a2a]">
-                      <th className="text-left p-4 font-semibold text-gray-400 text-sm">
-                        <div className="flex items-center gap-2">
-                          <FiFileText className="text-indigo-400" size={16} />
+                      <th className="text-left p-3 sm:p-4 font-semibold text-gray-400 text-xs sm:text-sm">
+                        <div className="flex items-center gap-1 sm:gap-2">
+                          <FiFileText className="text-indigo-400" size={14} />
                           <span>Task</span>
                         </div>
                       </th>
-                      <th className="text-left p-4 font-semibold text-gray-400 text-sm w-40">
-                        <div className="flex items-center gap-2">
-                          <FiCheckCircle className="text-indigo-400" size={16} />
+                      <th className="text-left p-3 sm:p-4 font-semibold text-gray-400 text-xs sm:text-sm w-32 sm:w-40">
+                        <div className="flex items-center gap-1 sm:gap-2">
+                          <FiCheckCircle className="text-indigo-400" size={14} />
                           <span>Status</span>
                         </div>
                       </th>
-                      <th className="text-left p-4 font-semibold text-gray-400 text-sm w-36">
-                        <div className="flex items-center gap-2">
-                          <FiAlertCircle className="text-indigo-400" size={16} />
+                      <th className="text-left p-3 sm:p-4 font-semibold text-gray-400 text-xs sm:text-sm w-28 sm:w-36">
+                        <div className="flex items-center gap-1 sm:gap-2">
+                          <FiAlertCircle className="text-indigo-400" size={14} />
                           <span>Priority</span>
                         </div>
                       </th>
-                      <th className="text-left p-4 font-semibold text-gray-400 text-sm w-44">
-                        <div className="flex items-center gap-2">
-                          <FiUser className="text-indigo-400" size={16} />
+                      <th className="text-left p-3 sm:p-4 font-semibold text-gray-400 text-xs sm:text-sm w-36 sm:w-44">
+                        <div className="flex items-center gap-1 sm:gap-2">
+                          <FiUser className="text-indigo-400" size={14} />
                           <span>Assigned To</span>
                         </div>
                       </th>
-                      <th className="text-left p-4 font-semibold text-gray-400 text-sm w-40">
-                        <div className="flex items-center gap-2">
-                          <FiCalendar className="text-indigo-400" size={16} />
+                      <th className="text-left p-3 sm:p-4 font-semibold text-gray-400 text-xs sm:text-sm w-32 sm:w-40">
+                        <div className="flex items-center gap-1 sm:gap-2">
+                          <FiCalendar className="text-indigo-400" size={14} />
                           <span>Deadline</span>
                         </div>
                       </th>
-                      <th className="text-left p-4 font-semibold text-gray-400 text-sm w-56">
-                        <div className="flex items-center gap-2">
-                          <FiMessageSquare className="text-indigo-400" size={16} />
+                      <th className="text-left p-3 sm:p-4 font-semibold text-gray-400 text-xs sm:text-sm w-44 sm:w-56">
+                        <div className="flex items-center gap-1 sm:gap-2">
+                          <FiMessageSquare className="text-indigo-400" size={14} />
                           <span>Comment</span>
                         </div>
                       </th>
-                      <th className="w-12"></th>
+                      <th className="w-10 sm:w-12"></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -678,7 +686,7 @@ export default function ProjectDetailPage() {
                         key={task.id}
                         className="border-b border-[#2a2a2a] hover:bg-[#1f1f1f] transition-colors group"
                       >
-                        <td className="p-3">
+                        <td className="p-2 sm:p-3">
                           <input
                             type="text"
                             value={task.task}
@@ -691,10 +699,10 @@ export default function ProjectDetailPage() {
                               )
                             }
                             placeholder="Empty"
-                            className="w-full bg-transparent border-none outline-none px-3 py-2 rounded-lg hover:bg-[#2a2a2a] focus:bg-[#2a2a2a] transition-all text-sm text-gray-300 placeholder-gray-600"
+                            className="w-full bg-transparent border-none outline-none px-2 sm:px-3 py-2 rounded-lg hover:bg-[#2a2a2a] focus:bg-[#2a2a2a] transition-all text-xs sm:text-sm text-gray-300 placeholder-gray-600"
                           />
                         </td>
-                        <td className="p-3">
+                        <td className="p-2 sm:p-3">
                           <StatusDropdown
                             value={task.status}
                             onChange={(value) =>
@@ -707,7 +715,7 @@ export default function ProjectDetailPage() {
                             }
                           />
                         </td>
-                        <td className="p-3">
+                        <td className="p-2 sm:p-3">
                           <PriorityDropdown
                             value={task.priority}
                             onChange={(value) =>
@@ -720,7 +728,7 @@ export default function ProjectDetailPage() {
                             }
                           />
                         </td>
-                        <td className="p-3">
+                        <td className="p-2 sm:p-3">
                           <AssignedToDropdown
                             value={task.assignedTo}
                             onChange={(value) =>
@@ -734,7 +742,7 @@ export default function ProjectDetailPage() {
                             users={users}
                           />
                         </td>
-                        <td className="p-3">
+                        <td className="p-2 sm:p-3">
                           <input
                             type="date"
                             value={
@@ -752,10 +760,10 @@ export default function ProjectDetailPage() {
                                 e.target.value ? new Date(e.target.value) : null
                               )
                             }
-                            className="w-full bg-transparent border-none outline-none px-3 py-2 rounded-lg hover:bg-[#2a2a2a] focus:bg-[#2a2a2a] transition-all text-sm text-gray-300 placeholder-gray-600"
+                            className="w-full bg-transparent border-none outline-none px-2 sm:px-3 py-2 rounded-lg hover:bg-[#2a2a2a] focus:bg-[#2a2a2a] transition-all text-xs sm:text-sm text-gray-300 placeholder-gray-600"
                           />
                         </td>
-                        <td className="p-3">
+                        <td className="p-2 sm:p-3">
                           <input
                             type="text"
                             value={task.comment}
@@ -768,32 +776,33 @@ export default function ProjectDetailPage() {
                               )
                             }
                             placeholder="Add a comment..."
-                            className="w-full bg-transparent border-none outline-none px-3 py-2 rounded-lg hover:bg-[#2a2a2a] focus:bg-[#2a2a2a] transition-all text-sm text-gray-300 placeholder-gray-600"
+                            className="w-full bg-transparent border-none outline-none px-2 sm:px-3 py-2 rounded-lg hover:bg-[#2a2a2a] focus:bg-[#2a2a2a] transition-all text-xs sm:text-sm text-gray-300 placeholder-gray-600"
                           />
                         </td>
-                        <td className="p-3 text-center">
+                        <td className="p-2 sm:p-3 text-center">
                           <button
                             onClick={() =>
                               handleDeleteTask(subgroup.id, task.id)
                             }
-                            className="p-2 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+                            className="p-1.5 sm:p-2 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all"
                             title="Delete task"
                           >
-                            <FiTrash2 size={16} />
+                            <FiTrash2 size={14} className="sm:w-4 sm:h-4" />
                           </button>
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
+                </div>
               </div>
 
               {/* Add Task Button */}
               <button
                 onClick={() => handleAddTask(subgroup.id)}
-                className="mt-5 flex items-center gap-2 text-indigo-400 hover:text-indigo-300 hover:bg-indigo-500/10 px-4 py-2.5 rounded-lg transition-all border border-transparent hover:border-indigo-500/30"
+                className="mt-4 sm:mt-5 flex items-center gap-2 text-indigo-400 hover:text-indigo-300 hover:bg-indigo-500/10 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-all border border-transparent hover:border-indigo-500/30 text-sm sm:text-base"
               >
-                <FiPlus size={20} />
+                <FiPlus size={18} className="sm:w-5 sm:h-5" />
                 <span className="font-medium">Add Task</span>
               </button>
             </div>
@@ -803,9 +812,9 @@ export default function ProjectDetailPage() {
         {/* Add Subgroup Button */}
         <button
           onClick={handleAddSubgroup}
-          className="mt-8 flex items-center gap-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-xl hover:from-indigo-500 hover:to-purple-500 transition-all duration-200 font-semibold shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:scale-105 active:scale-95"
+          className="mt-6 sm:mt-8 w-full sm:w-auto flex items-center justify-center gap-2 sm:gap-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl hover:from-indigo-500 hover:to-purple-500 transition-all duration-200 font-semibold shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:scale-105 active:scale-95 text-sm sm:text-base"
         >
-          <FiPlus size={22} />
+          <FiPlus size={20} className="sm:w-[22px] sm:h-[22px]" />
           Add Subgroup
         </button>
       </div>
