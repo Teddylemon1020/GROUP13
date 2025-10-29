@@ -18,7 +18,7 @@ export async function connectDB() {
   if (!cached.promise) {
     cached.promise = mongoose
       .connect(MONGODB_URI, {
-        dbName: "Portfolio", // change to your DB name
+        dbName: "Eventura",
       })
       .then((mongoose) => mongoose);
   }

@@ -13,6 +13,7 @@ import {
   FiCalendar,
   FiCheckCircle,
   FiAlertCircle,
+  FiMessageSquare,
 } from "react-icons/fi";
 
 interface ITask {
@@ -22,6 +23,7 @@ interface ITask {
   deadline: Date | null;
   status: "todo" | "in-progress" | "done" | "";
   priority: "high" | "medium" | "low" | "";
+  comment: string;
 }
 
 interface ISubgroup {
@@ -39,6 +41,13 @@ interface IProject {
   subgroups: ISubgroup[];
   createdAt: Date;
   updatedAt: Date;
+}
+
+interface IUser {
+  _id: string;
+  name?: string;
+  email: string;
+  image?: string;
 }
 
 // Status Dropdown Component
@@ -188,6 +197,106 @@ function PriorityDropdown({
   );
 }
 
+// Assigned To Dropdown Component
+function AssignedToDropdown({
+  value,
+  onChange,
+  users,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  users: IUser[];
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const selectedUser = users.find((user) => user.email === value);
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all hover:bg-[#2a2a2a] bg-[#1a1a1a] text-gray-300 border border-[#2a2a2a] min-w-[140px] text-left flex items-center gap-2"
+      >
+        {selectedUser ? (
+          <>
+            {selectedUser.image && (
+              <img
+                src={selectedUser.image}
+                alt={selectedUser.name || selectedUser.email}
+                className="w-5 h-5 rounded-full"
+              />
+            )}
+            <span className="truncate">
+              {selectedUser.name || selectedUser.email}
+            </span>
+          </>
+        ) : (
+          <span className="text-gray-500">Empty</span>
+        )}
+      </button>
+      {isOpen && (
+        <div className="absolute z-10 mt-1 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg shadow-2xl py-1 min-w-[200px] max-h-60 overflow-y-auto">
+          {/* Empty option */}
+          <button
+            onClick={() => {
+              onChange("");
+              setIsOpen(false);
+            }}
+            className="w-full text-left px-3 py-2 hover:bg-[#2a2a2a] transition-colors text-gray-500 text-xs"
+          >
+            Empty
+          </button>
+
+          {/* User options */}
+          {users.map((user) => (
+            <button
+              key={user._id}
+              onClick={() => {
+                onChange(user.email);
+                setIsOpen(false);
+              }}
+              className="w-full text-left px-3 py-2 hover:bg-[#2a2a2a] transition-colors flex items-center gap-2"
+            >
+              {user.image && (
+                <img
+                  src={user.image}
+                  alt={user.name || user.email}
+                  className="w-6 h-6 rounded-full"
+                />
+              )}
+              <div className="flex flex-col min-w-0 flex-1">
+                <span className="text-sm text-gray-300 truncate">
+                  {user.name || user.email}
+                </span>
+                {user.name && (
+                  <span className="text-xs text-gray-500 truncate">
+                    {user.email}
+                  </span>
+                )}
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function ProjectDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -199,10 +308,12 @@ export default function ProjectDetailPage() {
   const [projectName, setProjectName] = useState("");
   const [editingSubgroupId, setEditingSubgroupId] = useState<string | null>(null);
   const [editingSubgroupTitle, setEditingSubgroupTitle] = useState("");
+  const [users, setUsers] = useState<IUser[]>([]);
 
-  // Fetch project data
+  // Fetch project data and users
   useEffect(() => {
     fetchProject();
+    fetchUsers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId]);
 
@@ -221,6 +332,27 @@ export default function ProjectDetailPage() {
       console.error("Error fetching project:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchUsers = async () => {
+    try {
+      console.log("🔍 Fetching users...");
+      const response = await fetch("/api/users");
+      console.log("📡 Response status:", response.status);
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("✅ Users fetched:", data.users);
+        console.log("📊 Number of users:", data.users?.length);
+        setUsers(data.users || []);
+      } else {
+        console.error("❌ Failed to fetch users. Status:", response.status);
+        const errorData = await response.json();
+        console.error("Error details:", errorData);
+      }
+    } catch (error) {
+      console.error("💥 Error fetching users:", error);
     }
   };
 
@@ -262,6 +394,7 @@ export default function ProjectDetailPage() {
           deadline: null,
           status: "",
           priority: "",
+          comment: "",
         },
       ],
       createdAt: new Date(),
@@ -304,6 +437,7 @@ export default function ProjectDetailPage() {
       deadline: null,
       status: "",
       priority: "",
+      comment: "",
     };
 
     const updatedSubgroups = project.subgroups.map((sg) =>
@@ -529,6 +663,12 @@ export default function ProjectDetailPage() {
                           <span>Deadline</span>
                         </div>
                       </th>
+                      <th className="text-left p-4 font-semibold text-gray-400 text-sm w-56">
+                        <div className="flex items-center gap-2">
+                          <FiMessageSquare className="text-indigo-400" size={16} />
+                          <span>Comment</span>
+                        </div>
+                      </th>
                       <th className="w-12"></th>
                     </tr>
                   </thead>
@@ -581,19 +721,17 @@ export default function ProjectDetailPage() {
                           />
                         </td>
                         <td className="p-3">
-                          <input
-                            type="text"
+                          <AssignedToDropdown
                             value={task.assignedTo}
-                            onChange={(e) =>
+                            onChange={(value) =>
                               handleUpdateTask(
                                 subgroup.id,
                                 task.id,
                                 "assignedTo",
-                                e.target.value
+                                value
                               )
                             }
-                            placeholder="Empty"
-                            className="w-full bg-transparent border-none outline-none px-3 py-2 rounded-lg hover:bg-[#2a2a2a] focus:bg-[#2a2a2a] transition-all text-sm text-gray-300 placeholder-gray-600"
+                            users={users}
                           />
                         </td>
                         <td className="p-3">
@@ -614,6 +752,22 @@ export default function ProjectDetailPage() {
                                 e.target.value ? new Date(e.target.value) : null
                               )
                             }
+                            className="w-full bg-transparent border-none outline-none px-3 py-2 rounded-lg hover:bg-[#2a2a2a] focus:bg-[#2a2a2a] transition-all text-sm text-gray-300 placeholder-gray-600"
+                          />
+                        </td>
+                        <td className="p-3">
+                          <input
+                            type="text"
+                            value={task.comment}
+                            onChange={(e) =>
+                              handleUpdateTask(
+                                subgroup.id,
+                                task.id,
+                                "comment",
+                                e.target.value
+                              )
+                            }
+                            placeholder="Add a comment..."
                             className="w-full bg-transparent border-none outline-none px-3 py-2 rounded-lg hover:bg-[#2a2a2a] focus:bg-[#2a2a2a] transition-all text-sm text-gray-300 placeholder-gray-600"
                           />
                         </td>
