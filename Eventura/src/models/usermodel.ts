@@ -6,6 +6,7 @@ export interface IUser extends Document {
   email: string;
   image?: string;
   emailVerified?: Date;
+  projects: string[]; // Array of project IDs the user is assigned to
   createdAt: Date;
   updatedAt: Date;
 }
@@ -27,6 +28,11 @@ const UserSchema = new Schema<IUser>(
     },
     emailVerified: {
       type: Date,
+    },
+    projects: {
+      type: [String],
+      default: [],
+      index: true,
     },
   },
   {

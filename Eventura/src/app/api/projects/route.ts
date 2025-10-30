@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import dbConnect from '@/utils/mongodb';
 import Project from '@/models/projectmodel';
+import User from '@/models/usermodel';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
 // GET all projects for the authenticated user
@@ -15,7 +16,13 @@ export async function GET() {
 
     await dbConnect();
 
-    const projects = await Project.find({ userId: session.user.email })
+    // Find projects where user is either the owner OR a member
+    const projects = await Project.find({
+      $or: [
+        { userId: session.user.email },
+        { 'members.userId': session.user.email }
+      ]
+    })
       .sort({ createdAt: -1 })
       .lean();
 
@@ -43,12 +50,30 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { name, description } = body;
 
+    // Create the project with the owner in the members array
     const project = await Project.create({
       name: name || 'Untitled Project',
       description: description || '',
       userId: session.user.email,
+      members: [
+        {
+          userId: session.user.email,
+          role: 'owner',
+          addedAt: new Date(),
+        }
+      ],
       subgroups: [],
     });
+
+    // Add the project to the user's projects array
+    const user = await User.findOne({ email: session.user.email });
+    if (user) {
+      if (!user.projects) {
+        user.projects = [];
+      }
+      user.projects.push(String(project._id));
+      await user.save();
+    }
 
     return NextResponse.json({ project }, { status: 201 });
   } catch (error) {

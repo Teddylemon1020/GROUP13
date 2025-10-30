@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import dbConnect from '@/utils/mongodb';
 import Project from '@/models/projectmodel';
+import User from '@/models/usermodel';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
 // GET a single project by ID
@@ -20,9 +21,13 @@ export async function GET(
 
     const { id } = await params;
 
+    // Find project where user is either the owner OR a member
     const project = await Project.findOne({
       _id: id,
-      userId: session.user.email,
+      $or: [
+        { userId: session.user.email },
+        { 'members.userId': session.user.email }
+      ]
     }).lean();
 
     if (!project) {
@@ -57,8 +62,15 @@ export async function PUT(
     const body = await request.json();
     const { name, description, subgroups } = body;
 
+    // Allow update if user is owner OR member
     const project = await Project.findOneAndUpdate(
-      { _id: id, userId: session.user.email },
+      {
+        _id: id,
+        $or: [
+          { userId: session.user.email },
+          { 'members.userId': session.user.email }
+        ]
+      },
       {
         ...(name !== undefined && { name }),
         ...(description !== undefined && { description }),
@@ -81,7 +93,7 @@ export async function PUT(
   }
 }
 
-// DELETE a project
+// DELETE a project (owner only)
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -97,14 +109,27 @@ export async function DELETE(
 
     const { id } = await params;
 
-    const project = await Project.findOneAndDelete({
+    // Only allow owner to delete
+    const project = await Project.findOne({
       _id: id,
       userId: session.user.email,
     });
 
     if (!project) {
-      return NextResponse.json({ error: 'Project not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Project not found or you are not the owner' }, { status: 404 });
     }
+
+    // Remove project from all members' projects arrays
+    const memberEmails = project.members?.map(member => member.userId) || [];
+    if (memberEmails.length > 0) {
+      await User.updateMany(
+        { email: { $in: memberEmails } },
+        { $pull: { projects: id } }
+      );
+    }
+
+    // Delete the project
+    await Project.findByIdAndDelete(id);
 
     return NextResponse.json(
       { message: 'Project deleted successfully' },

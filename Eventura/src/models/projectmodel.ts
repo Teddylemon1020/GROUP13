@@ -1,5 +1,12 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
 
+// Member interface for project access
+export interface IMember {
+  userId: string; // User email or ID
+  role: 'owner' | 'member';
+  addedAt: Date;
+}
+
 // Task interface for subgroup tables
 export interface ITask {
   id: string;
@@ -22,12 +29,30 @@ export interface ISubgroup {
 // Project interface
 export interface IProject extends Document {
   name: string;
-  userId: string;
+  userId: string; // Project owner
   description?: string;
+  members: IMember[]; // Array of users assigned to this project
   subgroups: ISubgroup[];
   createdAt: Date;
   updatedAt: Date;
 }
+
+// Member schema
+const MemberSchema = new Schema({
+  userId: {
+    type: String,
+    required: true,
+  },
+  role: {
+    type: String,
+    enum: ['owner', 'member'],
+    default: 'member',
+  },
+  addedAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
 
 // Task schema
 const TaskSchema = new Schema({
@@ -103,6 +128,11 @@ const ProjectSchema = new Schema<IProject>(
     description: {
       type: String,
       default: '',
+    },
+    members: {
+      type: [MemberSchema],
+      default: [],
+      index: true,
     },
     subgroups: {
       type: [SubgroupSchema],

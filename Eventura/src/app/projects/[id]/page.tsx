@@ -465,6 +465,30 @@ export default function ProjectDetailPage() {
     updateProject({ subgroups: updatedSubgroups });
   };
 
+  const assignUserToProject = async (userEmail: string) => {
+    try {
+      const response = await fetch(`/api/projects/${projectId}/members`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userEmail }),
+      });
+
+      if (response.ok) {
+        console.log(`✅ User ${userEmail} added as project member`);
+      } else {
+        const errorData = await response.json();
+        // Silently handle if user is already a member
+        if (errorData.error === "User is already a member of this project") {
+          console.log(`ℹ️ User ${userEmail} is already a member`);
+        } else {
+          console.error("Failed to add user as member:", errorData);
+        }
+      }
+    } catch (error) {
+      console.error("Error adding user as member:", error);
+    }
+  };
+
   const handleUpdateTask = (
     subgroupId: string,
     taskId: string,
@@ -472,6 +496,11 @@ export default function ProjectDetailPage() {
     value: string | Date | null
   ) => {
     if (!project) return;
+
+    // If assigning a task to a user, automatically add them as a project member
+    if (field === "assignedTo" && value && typeof value === "string") {
+      assignUserToProject(value);
+    }
 
     const updatedSubgroups = project.subgroups.map((sg) =>
       sg.id === subgroupId
