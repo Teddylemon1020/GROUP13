@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { createPortal } from "react-dom";
 import {
   FiPlus,
   FiTrash2,
@@ -59,13 +60,17 @@ function StatusDropdown({
   onChange: (value: "todo" | "in-progress" | "done" | "") => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [position, setPosition] = useState({ top: 0, left: 0, width: 0 });
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
+        !dropdownRef.current.contains(event.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
       ) {
         setIsOpen(false);
       }
@@ -74,6 +79,17 @@ function StatusDropdown({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setPosition({
+        top: rect.bottom,
+        left: rect.left,
+        width: rect.width,
+      });
+    }
+  }, [isOpen]);
 
   const statusOptions = [
     { value: "", label: "Empty", color: "bg-gray-700/50 text-gray-400" },
@@ -86,11 +102,13 @@ function StatusDropdown({
     { value: "done", label: "Done", color: "bg-green-500/20 text-green-400" },
   ];
 
-  const selectedOption = statusOptions.find((opt) => opt.value === value) || statusOptions[0];
+  const selectedOption =
+    statusOptions.find((opt) => opt.value === value) || statusOptions[0];
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative">
       <button
+        ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
         className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all hover:opacity-80 ${
           selectedOption.color
@@ -98,26 +116,33 @@ function StatusDropdown({
       >
         {selectedOption.label}
       </button>
-      {isOpen && (
-        <div className="absolute z-10 mt-1 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg shadow-2xl py-1 min-w-[140px]">
-          {statusOptions.map((option) => (
-            <button
-              key={option.value}
-              onClick={() => {
-                onChange(option.value as any);
-                setIsOpen(false);
-              }}
-              className="w-full text-left px-3 py-2 hover:bg-[#2a2a2a] transition-colors"
-            >
-              <span
-                className={`px-2 py-1 rounded-lg text-xs font-medium ${option.color}`}
+      {isOpen &&
+        typeof window !== "undefined" &&
+        createPortal(
+          <div
+            ref={dropdownRef}
+            className="fixed z-[9999] mt-1 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg shadow-2xl py-1 w-[100px]"
+            style={{ top: `${position.top}px`, left: `${position.left}px` }}
+          >
+            {statusOptions.map((option) => (
+              <button
+                key={option.value}
+                onClick={() => {
+                  onChange(option.value as any);
+                  setIsOpen(false);
+                }}
+                className="w-full text-left px-2 py-1.5 hover:bg-[#2a2a2a] transition-colors"
               >
-                {option.label}
-              </span>
-            </button>
-          ))}
-        </div>
-      )}
+                <span
+                  className={`px-1.5 py-0.5 rounded text-xs font-medium ${option.color}`}
+                >
+                  {option.label}
+                </span>
+              </button>
+            ))}
+          </div>,
+          document.body
+        )}
     </div>
   );
 }
@@ -131,13 +156,17 @@ function PriorityDropdown({
   onChange: (value: "high" | "medium" | "low" | "") => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [position, setPosition] = useState({ top: 0, left: 0, width: 0 });
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
+        !dropdownRef.current.contains(event.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
       ) {
         setIsOpen(false);
       }
@@ -147,23 +176,51 @@ function PriorityDropdown({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    if (isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setPosition({
+        top: rect.bottom,
+        left: rect.left,
+        width: rect.width,
+      });
+    }
+  }, [isOpen]);
+
   const priorityOptions = [
-    { value: "", label: "Empty", color: "bg-gray-700/50 text-gray-400", icon: "○" },
-    { value: "high", label: "High", color: "bg-red-500/20 text-red-400", icon: "●" },
+    {
+      value: "",
+      label: "Empty",
+      color: "bg-gray-700/50 text-gray-400",
+      icon: "○",
+    },
+    {
+      value: "high",
+      label: "High",
+      color: "bg-red-500/20 text-red-400",
+      icon: "●",
+    },
     {
       value: "medium",
       label: "Medium",
       color: "bg-yellow-500/20 text-yellow-400",
       icon: "●",
     },
-    { value: "low", label: "Low", color: "bg-blue-500/20 text-blue-400", icon: "●" },
+    {
+      value: "low",
+      label: "Low",
+      color: "bg-blue-500/20 text-blue-400",
+      icon: "●",
+    },
   ];
 
-  const selectedOption = priorityOptions.find((opt) => opt.value === value) || priorityOptions[0];
+  const selectedOption =
+    priorityOptions.find((opt) => opt.value === value) || priorityOptions[0];
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative">
       <button
+        ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
         className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all hover:opacity-80 flex items-center gap-1 ${
           selectedOption.color
@@ -172,27 +229,34 @@ function PriorityDropdown({
         <span>{selectedOption.icon}</span>
         <span>{selectedOption.label}</span>
       </button>
-      {isOpen && (
-        <div className="absolute z-10 mt-1 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg shadow-2xl py-1 min-w-[130px]">
-          {priorityOptions.map((option) => (
-            <button
-              key={option.value}
-              onClick={() => {
-                onChange(option.value as any);
-                setIsOpen(false);
-              }}
-              className="w-full text-left px-3 py-2 hover:bg-[#2a2a2a] transition-colors"
-            >
-              <span
-                className={`px-2 py-1 rounded-lg text-xs font-medium flex items-center gap-1 ${option.color}`}
+      {isOpen &&
+        typeof window !== "undefined" &&
+        createPortal(
+          <div
+            ref={dropdownRef}
+            className="fixed z-[9999] mt-1 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg shadow-2xl py-1 w-[100px]"
+            style={{ top: `${position.top}px`, left: `${position.left}px` }}
+          >
+            {priorityOptions.map((option) => (
+              <button
+                key={option.value}
+                onClick={() => {
+                  onChange(option.value as any);
+                  setIsOpen(false);
+                }}
+                className="w-full text-left px-2 py-1.5 hover:bg-[#2a2a2a] transition-colors"
               >
-                <span>{option.icon}</span>
-                <span>{option.label}</span>
-              </span>
-            </button>
-          ))}
-        </div>
-      )}
+                <span
+                  className={`px-1.5 py-0.5 rounded text-xs font-medium flex items-center gap-1 ${option.color}`}
+                >
+                  <span>{option.icon}</span>
+                  <span>{option.label}</span>
+                </span>
+              </button>
+            ))}
+          </div>,
+          document.body
+        )}
     </div>
   );
 }
@@ -208,13 +272,17 @@ function AssignedToDropdown({
   users: IUser[];
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [position, setPosition] = useState({ top: 0, left: 0, width: 0 });
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
+        !dropdownRef.current.contains(event.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
       ) {
         setIsOpen(false);
       }
@@ -224,11 +292,23 @@ function AssignedToDropdown({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    if (isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setPosition({
+        top: rect.bottom,
+        left: rect.left,
+        width: rect.width,
+      });
+    }
+  }, [isOpen]);
+
   const selectedUser = users.find((user) => user.email === value);
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative">
       <button
+        ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
         className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all hover:bg-[#2a2a2a] bg-[#1a1a1a] text-gray-300 border border-[#2a2a2a] min-w-[140px] text-left flex items-center gap-2"
       >
@@ -249,50 +329,57 @@ function AssignedToDropdown({
           <span className="text-gray-500">Empty</span>
         )}
       </button>
-      {isOpen && (
-        <div className="absolute z-10 mt-1 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg shadow-2xl py-1 min-w-[200px] max-h-60 overflow-y-auto">
-          {/* Empty option */}
-          <button
-            onClick={() => {
-              onChange("");
-              setIsOpen(false);
-            }}
-            className="w-full text-left px-3 py-2 hover:bg-[#2a2a2a] transition-colors text-gray-500 text-xs"
+      {isOpen &&
+        typeof window !== "undefined" &&
+        createPortal(
+          <div
+            ref={dropdownRef}
+            className="fixed z-[9999] mt-1 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg shadow-2xl py-1 max-h-60 overflow-y-auto"
+            style={{ top: `${position.top}px`, left: `${position.left}px` }}
           >
-            Empty
-          </button>
-
-          {/* User options */}
-          {users.map((user) => (
+            {/* Empty option */}
             <button
-              key={user._id}
               onClick={() => {
-                onChange(user.email);
+                onChange("");
                 setIsOpen(false);
               }}
-              className="w-full text-left px-3 py-2 hover:bg-[#2a2a2a] transition-colors flex items-center gap-2"
+              className="w-full text-left px-3 py-2 hover:bg-[#2a2a2a] transition-colors text-gray-500 text-xs"
             >
-              {user.image && (
-                <img
-                  src={user.image}
-                  alt={user.name || user.email}
-                  className="w-6 h-6 rounded-full"
-                />
-              )}
-              <div className="flex flex-col min-w-0 flex-1">
-                <span className="text-sm text-gray-300 truncate">
-                  {user.name || user.email}
-                </span>
-                {user.name && (
-                  <span className="text-xs text-gray-500 truncate">
-                    {user.email}
-                  </span>
-                )}
-              </div>
+              Empty
             </button>
-          ))}
-        </div>
-      )}
+
+            {/* User options */}
+            {users.map((user) => (
+              <button
+                key={user._id}
+                onClick={() => {
+                  onChange(user.email);
+                  setIsOpen(false);
+                }}
+                className="w-full text-left px-3 py-2 hover:bg-[#2a2a2a] transition-colors flex items-center gap-2"
+              >
+                {user.image && (
+                  <img
+                    src={user.image}
+                    alt={user.name || user.email}
+                    className="w-6 h-6 rounded-full"
+                  />
+                )}
+                <div className="flex flex-col min-w-0 flex-1">
+                  <span className="text-sm text-gray-300 truncate">
+                    {user.name || user.email}
+                  </span>
+                  {user.name && (
+                    <span className="text-xs text-gray-500 truncate">
+                      {user.email}
+                    </span>
+                  )}
+                </div>
+              </button>
+            ))}
+          </div>,
+          document.body
+        )}
     </div>
   );
 }
@@ -306,7 +393,9 @@ export default function ProjectDetailPage() {
   const [loading, setLoading] = useState(true);
   const [editingTitle, setEditingTitle] = useState(false);
   const [projectName, setProjectName] = useState("");
-  const [editingSubgroupId, setEditingSubgroupId] = useState<string | null>(null);
+  const [editingSubgroupId, setEditingSubgroupId] = useState<string | null>(
+    null
+  );
   const [editingSubgroupTitle, setEditingSubgroupTitle] = useState("");
   const [users, setUsers] = useState<IUser[]>([]);
 
@@ -521,9 +610,24 @@ export default function ProjectDetailPage() {
     return (
       <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <svg className="animate-spin h-10 w-10 text-indigo-500" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          <svg
+            className="animate-spin h-10 w-10 text-indigo-500"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+              fill="none"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
           </svg>
           <div className="text-lg text-gray-400">Loading project...</div>
         </div>
@@ -551,7 +655,9 @@ export default function ProjectDetailPage() {
             onClick={() => router.push("/home")}
             className="text-gray-400 hover:text-indigo-400 mb-4 sm:mb-6 flex items-center gap-2 transition-colors group text-sm sm:text-base"
           >
-            <span className="group-hover:-translate-x-1 transition-transform">←</span>
+            <span className="group-hover:-translate-x-1 transition-transform">
+              ←
+            </span>
             <span>Back to Projects</span>
           </button>
 
@@ -668,161 +774,172 @@ export default function ProjectDetailPage() {
               <div className="overflow-x-auto rounded-xl border border-[#2a2a2a] bg-[#1a1a1a] -mx-4 sm:mx-0">
                 <div className="min-w-[900px]">
                   <table className="w-full border-collapse">
-                  <thead>
-                    <tr className="bg-[#1f1f1f] border-b border-[#2a2a2a]">
-                      <th className="text-left p-3 sm:p-4 font-semibold text-gray-400 text-xs sm:text-sm">
-                        <div className="flex items-center gap-1 sm:gap-2">
-                          <FiFileText className="text-indigo-400" size={14} />
-                          <span>Task</span>
-                        </div>
-                      </th>
-                      <th className="text-left p-3 sm:p-4 font-semibold text-gray-400 text-xs sm:text-sm w-32 sm:w-40">
-                        <div className="flex items-center gap-1 sm:gap-2">
-                          <FiCheckCircle className="text-indigo-400" size={14} />
-                          <span>Status</span>
-                        </div>
-                      </th>
-                      <th className="text-left p-3 sm:p-4 font-semibold text-gray-400 text-xs sm:text-sm w-28 sm:w-36">
-                        <div className="flex items-center gap-1 sm:gap-2">
-                          <FiAlertCircle className="text-indigo-400" size={14} />
-                          <span>Priority</span>
-                        </div>
-                      </th>
-                      <th className="text-left p-3 sm:p-4 font-semibold text-gray-400 text-xs sm:text-sm w-36 sm:w-44">
-                        <div className="flex items-center gap-1 sm:gap-2">
-                          <FiUser className="text-indigo-400" size={14} />
-                          <span>Assigned To</span>
-                        </div>
-                      </th>
-                      <th className="text-left p-3 sm:p-4 font-semibold text-gray-400 text-xs sm:text-sm w-32 sm:w-40">
-                        <div className="flex items-center gap-1 sm:gap-2">
-                          <FiCalendar className="text-indigo-400" size={14} />
-                          <span>Deadline</span>
-                        </div>
-                      </th>
-                      <th className="text-left p-3 sm:p-4 font-semibold text-gray-400 text-xs sm:text-sm w-44 sm:w-56">
-                        <div className="flex items-center gap-1 sm:gap-2">
-                          <FiMessageSquare className="text-indigo-400" size={14} />
-                          <span>Comment</span>
-                        </div>
-                      </th>
-                      <th className="w-10 sm:w-12"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {subgroup.tasks.map((task) => (
-                      <tr
-                        key={task.id}
-                        className="border-b border-[#2a2a2a] hover:bg-[#1f1f1f] transition-colors group"
-                      >
-                        <td className="p-2 sm:p-3">
-                          <input
-                            type="text"
-                            value={task.task}
-                            onChange={(e) =>
-                              handleUpdateTask(
-                                subgroup.id,
-                                task.id,
-                                "task",
-                                e.target.value
-                              )
-                            }
-                            placeholder="Empty"
-                            className="w-full bg-transparent border-none outline-none px-2 sm:px-3 py-2 rounded-lg hover:bg-[#2a2a2a] focus:bg-[#2a2a2a] transition-all text-xs sm:text-sm text-gray-300 placeholder-gray-600"
-                          />
-                        </td>
-                        <td className="p-2 sm:p-3">
-                          <StatusDropdown
-                            value={task.status}
-                            onChange={(value) =>
-                              handleUpdateTask(
-                                subgroup.id,
-                                task.id,
-                                "status",
-                                value
-                              )
-                            }
-                          />
-                        </td>
-                        <td className="p-2 sm:p-3">
-                          <PriorityDropdown
-                            value={task.priority}
-                            onChange={(value) =>
-                              handleUpdateTask(
-                                subgroup.id,
-                                task.id,
-                                "priority",
-                                value
-                              )
-                            }
-                          />
-                        </td>
-                        <td className="p-2 sm:p-3">
-                          <AssignedToDropdown
-                            value={task.assignedTo}
-                            onChange={(value) =>
-                              handleUpdateTask(
-                                subgroup.id,
-                                task.id,
-                                "assignedTo",
-                                value
-                              )
-                            }
-                            users={users}
-                          />
-                        </td>
-                        <td className="p-2 sm:p-3">
-                          <input
-                            type="date"
-                            value={
-                              task.deadline
-                                ? new Date(task.deadline)
-                                    .toISOString()
-                                    .split("T")[0]
-                                : ""
-                            }
-                            onChange={(e) =>
-                              handleUpdateTask(
-                                subgroup.id,
-                                task.id,
-                                "deadline",
-                                e.target.value ? new Date(e.target.value) : null
-                              )
-                            }
-                            className="w-full bg-transparent border-none outline-none px-2 sm:px-3 py-2 rounded-lg hover:bg-[#2a2a2a] focus:bg-[#2a2a2a] transition-all text-xs sm:text-sm text-gray-300 placeholder-gray-600"
-                          />
-                        </td>
-                        <td className="p-2 sm:p-3">
-                          <input
-                            type="text"
-                            value={task.comment}
-                            onChange={(e) =>
-                              handleUpdateTask(
-                                subgroup.id,
-                                task.id,
-                                "comment",
-                                e.target.value
-                              )
-                            }
-                            placeholder="Add a comment..."
-                            className="w-full bg-transparent border-none outline-none px-2 sm:px-3 py-2 rounded-lg hover:bg-[#2a2a2a] focus:bg-[#2a2a2a] transition-all text-xs sm:text-sm text-gray-300 placeholder-gray-600"
-                          />
-                        </td>
-                        <td className="p-2 sm:p-3 text-center">
-                          <button
-                            onClick={() =>
-                              handleDeleteTask(subgroup.id, task.id)
-                            }
-                            className="p-1.5 sm:p-2 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all"
-                            title="Delete task"
-                          >
-                            <FiTrash2 size={14} className="sm:w-4 sm:h-4" />
-                          </button>
-                        </td>
+                    <thead>
+                      <tr className="bg-[#1f1f1f] border-b border-[#2a2a2a]">
+                        <th className="text-left p-3 sm:p-4 font-semibold text-gray-400 text-xs sm:text-sm">
+                          <div className="flex items-center gap-1 sm:gap-2">
+                            <FiFileText className="text-indigo-400" size={14} />
+                            <span>Task</span>
+                          </div>
+                        </th>
+                        <th className="text-left p-3 sm:p-4 font-semibold text-gray-400 text-xs sm:text-sm w-32 sm:w-40">
+                          <div className="flex items-center gap-1 sm:gap-2">
+                            <FiCheckCircle
+                              className="text-indigo-400"
+                              size={14}
+                            />
+                            <span>Status</span>
+                          </div>
+                        </th>
+                        <th className="text-left p-3 sm:p-4 font-semibold text-gray-400 text-xs sm:text-sm w-28 sm:w-36">
+                          <div className="flex items-center gap-1 sm:gap-2">
+                            <FiAlertCircle
+                              className="text-indigo-400"
+                              size={14}
+                            />
+                            <span>Priority</span>
+                          </div>
+                        </th>
+                        <th className="text-left p-3 sm:p-4 font-semibold text-gray-400 text-xs sm:text-sm w-36 sm:w-44">
+                          <div className="flex items-center gap-1 sm:gap-2">
+                            <FiUser className="text-indigo-400" size={14} />
+                            <span>Assigned To</span>
+                          </div>
+                        </th>
+                        <th className="text-left p-3 sm:p-4 font-semibold text-gray-400 text-xs sm:text-sm w-32 sm:w-40">
+                          <div className="flex items-center gap-1 sm:gap-2">
+                            <FiCalendar className="text-indigo-400" size={14} />
+                            <span>Deadline</span>
+                          </div>
+                        </th>
+                        <th className="text-left p-3 sm:p-4 font-semibold text-gray-400 text-xs sm:text-sm w-44 sm:w-56">
+                          <div className="flex items-center gap-1 sm:gap-2">
+                            <FiMessageSquare
+                              className="text-indigo-400"
+                              size={14}
+                            />
+                            <span>Comment</span>
+                          </div>
+                        </th>
+                        <th className="w-10 sm:w-12"></th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {subgroup.tasks.map((task) => (
+                        <tr
+                          key={task.id}
+                          className="border-b border-[#2a2a2a] hover:bg-[#1f1f1f] transition-colors group"
+                        >
+                          <td className="p-2 sm:p-3">
+                            <input
+                              type="text"
+                              value={task.task}
+                              onChange={(e) =>
+                                handleUpdateTask(
+                                  subgroup.id,
+                                  task.id,
+                                  "task",
+                                  e.target.value
+                                )
+                              }
+                              placeholder="Empty"
+                              className="w-full bg-transparent border-none outline-none px-2 sm:px-3 py-2 rounded-lg hover:bg-[#2a2a2a] focus:bg-[#2a2a2a] transition-all text-xs sm:text-sm text-gray-300 placeholder-gray-600"
+                            />
+                          </td>
+                          <td className="p-2 sm:p-3">
+                            <StatusDropdown
+                              value={task.status}
+                              onChange={(value) =>
+                                handleUpdateTask(
+                                  subgroup.id,
+                                  task.id,
+                                  "status",
+                                  value
+                                )
+                              }
+                            />
+                          </td>
+                          <td className="p-2 sm:p-3">
+                            <PriorityDropdown
+                              value={task.priority}
+                              onChange={(value) =>
+                                handleUpdateTask(
+                                  subgroup.id,
+                                  task.id,
+                                  "priority",
+                                  value
+                                )
+                              }
+                            />
+                          </td>
+                          <td className="p-2 sm:p-3">
+                            <AssignedToDropdown
+                              value={task.assignedTo}
+                              onChange={(value) =>
+                                handleUpdateTask(
+                                  subgroup.id,
+                                  task.id,
+                                  "assignedTo",
+                                  value
+                                )
+                              }
+                              users={users}
+                            />
+                          </td>
+                          <td className="p-2 sm:p-3">
+                            <input
+                              type="date"
+                              value={
+                                task.deadline
+                                  ? new Date(task.deadline)
+                                      .toISOString()
+                                      .split("T")[0]
+                                  : ""
+                              }
+                              onChange={(e) =>
+                                handleUpdateTask(
+                                  subgroup.id,
+                                  task.id,
+                                  "deadline",
+                                  e.target.value
+                                    ? new Date(e.target.value)
+                                    : null
+                                )
+                              }
+                              className="w-full bg-transparent border-none outline-none px-2 sm:px-3 py-2 rounded-lg hover:bg-[#2a2a2a] focus:bg-[#2a2a2a] transition-all text-xs sm:text-sm text-gray-300 placeholder-gray-600"
+                            />
+                          </td>
+                          <td className="p-2 sm:p-3">
+                            <input
+                              type="text"
+                              value={task.comment}
+                              onChange={(e) =>
+                                handleUpdateTask(
+                                  subgroup.id,
+                                  task.id,
+                                  "comment",
+                                  e.target.value
+                                )
+                              }
+                              placeholder="Add a comment..."
+                              className="w-full bg-transparent border-none outline-none px-2 sm:px-3 py-2 rounded-lg hover:bg-[#2a2a2a] focus:bg-[#2a2a2a] transition-all text-xs sm:text-sm text-gray-300 placeholder-gray-600"
+                            />
+                          </td>
+                          <td className="p-2 sm:p-3 text-center">
+                            <button
+                              onClick={() =>
+                                handleDeleteTask(subgroup.id, task.id)
+                              }
+                              className="p-1.5 sm:p-2 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all"
+                              title="Delete task"
+                            >
+                              <FiTrash2 size={14} className="sm:w-4 sm:h-4" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
 
