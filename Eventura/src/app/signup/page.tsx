@@ -21,22 +21,42 @@ export default function HomePage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-[#0a0a0a] p-6 relative overflow-hidden">
-      {/* Gradient background effects */}
-      <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/20 via-transparent to-purple-900/20"></div>
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
-
-      <div className="relative bg-[#161616] p-10 rounded-2xl shadow-2xl w-full max-w-md text-center border border-[#2a2a2a] backdrop-blur-sm">
+    <main
+      className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden"
+      style={{ background: 'var(--background)' }}
+    >
+      <div
+        className="relative p-10 rounded-2xl shadow-2xl w-full max-w-md text-center backdrop-blur-sm"
+        style={{
+          background: 'var(--card-bg)',
+          border: '1px solid var(--border)',
+          boxShadow: '0 25px 50px -12px var(--shadow)'
+        }}
+      >
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+          <h1
+            className="text-4xl font-bold mb-3"
+            style={{ color: 'var(--primary)' }}
+          >
             Welcome to Eventura
           </h1>
-          <p className="text-gray-400 text-lg">Your gateway to amazing events!</p>
+          <p
+            className="text-lg"
+            style={{ color: 'var(--muted)' }}
+          >
+            Your gateway to amazing events!
+          </p>
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg backdrop-blur-sm">
+          <div
+            className="mb-6 p-4 rounded-lg backdrop-blur-sm"
+            style={{
+              background: 'rgba(220, 38, 38, 0.1)',
+              border: '1px solid rgba(220, 38, 38, 0.3)',
+              color: 'var(--error)'
+            }}
+          >
             {error}
           </div>
         )}
@@ -44,7 +64,14 @@ export default function HomePage() {
         <button
           onClick={handleSignIn}
           disabled={isLoading}
-          className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-4 rounded-xl hover:from-indigo-500 hover:to-purple-500 transition-all duration-200 disabled:from-gray-600 disabled:to-gray-600 disabled:cursor-not-allowed font-semibold text-lg shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:scale-[1.02] active:scale-[0.98]"
+          className="w-full px-6 py-4 rounded-xl transition-all duration-200 disabled:cursor-not-allowed font-semibold text-lg hover:scale-[1.02] active:scale-[0.98]"
+          style={{
+            background: isLoading ? 'var(--muted)' : 'var(--primary)',
+            color: '#ffffff',
+            boxShadow: '0 10px 15px -3px var(--shadow)'
+          }}
+          onMouseEnter={(e) => !isLoading && (e.currentTarget.style.background = 'var(--primary-hover)')}
+          onMouseLeave={(e) => !isLoading && (e.currentTarget.style.background = 'var(--primary)')}
         >
           {isLoading ? (
             <span className="flex items-center justify-center gap-2">
