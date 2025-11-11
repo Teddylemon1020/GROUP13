@@ -1,4 +1,4 @@
-export type ThemeName = 'default' | 'dark' | 'ocean' | 'forest' | 'custom';
+export type ThemeName = 'default' | 'dark' | 'custom';
 
 export interface Theme {
   name: ThemeName;
@@ -69,54 +69,6 @@ export const themes: Record<ThemeName, Theme> = {
       muted: '#6b7280',          // Gray
       inputBg: '#1a1a1a',
       shadow: 'rgba(0, 0, 0, 0.3)',
-    },
-  },
-
-  // Ocean Blue - Blue-themed
-  ocean: {
-    name: 'ocean',
-    displayName: 'Ocean Blue',
-    colors: {
-      background: '#ffffff',
-      foreground: '#0c4a6e',     // Deep blue text
-      cardBg: '#f0f9ff',         // Light blue
-      cardHover: '#e0f2fe',
-      border: '#bae6fd',
-      borderHover: '#7dd3fc',
-      primary: '#0284c7',        // Sky blue
-      primaryHover: '#0369a1',
-      secondary: '#0891b2',      // Cyan
-      accent: '#06b6d4',
-      success: '#059669',
-      warning: '#d97706',
-      error: '#dc2626',
-      muted: '#64748b',          // Slate
-      inputBg: '#f8fafc',
-      shadow: 'rgba(2, 132, 199, 0.15)',
-    },
-  },
-
-  // Forest Green - Green-themed
-  forest: {
-    name: 'forest',
-    displayName: 'Forest Green',
-    colors: {
-      background: '#ffffff',
-      foreground: '#14532d',     // Deep green text
-      cardBg: '#f0fdf4',         // Light green
-      cardHover: '#dcfce7',
-      border: '#bbf7d0',
-      borderHover: '#86efac',
-      primary: '#16a34a',        // Green
-      primaryHover: '#15803d',
-      secondary: '#059669',      // Emerald
-      accent: '#0d9488',         // Teal
-      success: '#10b981',
-      warning: '#d97706',
-      error: '#dc2626',
-      muted: '#6b7280',
-      inputBg: '#f9fafb',
-      shadow: 'rgba(22, 163, 74, 0.15)',
     },
   },
 

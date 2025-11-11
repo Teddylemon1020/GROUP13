@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import connectDB from '@/utils/mongodb';
-import Project from '@/models/projectmodel';
-import User from '@/models/usermodel';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import connectDB from "@/utils/mongodb";
+import Project from "@/models/projectmodel";
+import User from "@/models/usermodel";
 
 // POST /api/projects/[id]/members - Assign a user to a project
 export async function POST(
@@ -14,14 +14,14 @@ export async function POST(
     const session = await getServerSession(authOptions);
 
     if (!session || !session.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { userEmail } = await request.json();
 
     if (!userEmail) {
       return NextResponse.json(
-        { error: 'User email is required' },
+        { error: "User email is required" },
         { status: 400 }
       );
     }
@@ -34,13 +34,13 @@ export async function POST(
     const project = await Project.findById(id);
 
     if (!project) {
-      return NextResponse.json({ error: 'Project not found' }, { status: 404 });
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
     // Check if the requester is the project owner
     if (project.userId !== session.user.email) {
       return NextResponse.json(
-        { error: 'Only the project owner can assign members' },
+        { error: "Only the project owner can assign members" },
         { status: 403 }
       );
     }
@@ -49,7 +49,7 @@ export async function POST(
     const userToAssign = await User.findOne({ email: userEmail });
 
     if (!userToAssign) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     // Check if the user is already a member
@@ -59,7 +59,7 @@ export async function POST(
 
     if (isMember) {
       return NextResponse.json(
-        { error: 'User is already a member of this project' },
+        { error: "User is already a member of this project" },
         { status: 400 }
       );
     }
@@ -71,7 +71,7 @@ export async function POST(
 
     project.members.push({
       userId: userEmail,
-      role: 'member',
+      role: "member",
       addedAt: new Date(),
     });
 
@@ -88,16 +88,16 @@ export async function POST(
     }
 
     return NextResponse.json({
-      message: 'User assigned to project successfully',
+      message: "User assigned to project successfully",
       member: {
         userId: userEmail,
-        role: 'member',
+        role: "member",
       },
     });
   } catch (error) {
-    console.error('Error assigning user to project:', error);
+    console.error("Error assigning user to project:", error);
     return NextResponse.json(
-      { error: 'Failed to assign user to project' },
+      { error: "Failed to assign user to project" },
       { status: 500 }
     );
   }
@@ -112,15 +112,15 @@ export async function DELETE(
     const session = await getServerSession(authOptions);
 
     if (!session || !session.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
-    const userEmail = searchParams.get('userEmail');
+    const userEmail = searchParams.get("userEmail");
 
     if (!userEmail) {
       return NextResponse.json(
-        { error: 'User email is required' },
+        { error: "User email is required" },
         { status: 400 }
       );
     }
@@ -133,21 +133,20 @@ export async function DELETE(
     const project = await Project.findById(id);
 
     if (!project) {
-      return NextResponse.json({ error: 'Project not found' }, { status: 404 });
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
     // Check if the requester is the project owner
     if (project.userId !== session.user.email) {
       return NextResponse.json(
-        { error: 'Only the project owner can remove members' },
+        { error: "Only the project owner can remove members" },
         { status: 403 }
       );
     }
 
     // Remove the user from the project's members array
-    project.members = project.members?.filter(
-      (member) => member.userId !== userEmail
-    ) || [];
+    project.members =
+      project.members?.filter((member) => member.userId !== userEmail) || [];
 
     await project.save();
 
@@ -155,19 +154,18 @@ export async function DELETE(
     const user = await User.findOne({ email: userEmail });
 
     if (user) {
-      user.projects = user.projects?.filter(
-        (projectId) => projectId !== id
-      ) || [];
+      user.projects =
+        user.projects?.filter((projectId) => projectId !== id) || [];
       await user.save();
     }
 
     return NextResponse.json({
-      message: 'User removed from project successfully',
+      message: "User removed from project successfully",
     });
   } catch (error) {
-    console.error('Error removing user from project:', error);
+    console.error("Error removing user from project:", error);
     return NextResponse.json(
-      { error: 'Failed to remove user from project' },
+      { error: "Failed to remove user from project" },
       { status: 500 }
     );
   }

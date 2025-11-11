@@ -109,7 +109,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('customColors', JSON.stringify(colors));
   };
 
-  const availableThemes: ThemeName[] = ['default', 'dark', 'ocean', 'forest', 'custom'];
+  const availableThemes: ThemeName[] = ['default', 'dark', 'custom'];
 
   return (
     <ThemeContext.Provider value={{ currentTheme, setTheme, availableThemes, customColors, setCustomColors }}>
