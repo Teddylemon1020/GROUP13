@@ -19,6 +19,8 @@ import {
   FiMail,
   FiUsers,
   FiSend,
+  FiChevronDown,
+  FiChevronUp,
 } from "react-icons/fi";
 
 interface ITask {
@@ -473,6 +475,7 @@ export default function ProjectDetailPage() {
   const [allUsers, setAllUsers] = useState<IUser[]>([]);
   const [projectMembers, setProjectMembers] = useState<IUser[]>([]);
   const [showMembersModal, setShowMembersModal] = useState(false);
+  const [showMembersDropdown, setShowMembersDropdown] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
   const [sendingInvite, setSendingInvite] = useState(false);
 
@@ -907,23 +910,30 @@ export default function ProjectDetailPage() {
 
         {/* Members Section */}
         <div
-          className="mb-8 rounded-xl shadow-lg p-6"
+          className="mb-8 rounded-xl shadow-lg p-4 sm:p-6"
           style={{
             background: "var(--card-bg)",
             border: "1px solid var(--border)",
           }}
         >
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <FiUsers size={24} style={{ color: "var(--primary)" }} />
+          <div
+            className="flex items-center justify-between cursor-pointer gap-2"
+            onClick={() => setShowMembersDropdown(!showMembersDropdown)}
+          >
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              <FiUsers
+                size={20}
+                className="sm:w-6 sm:h-6 shrink-0"
+                style={{ color: "var(--primary)" }}
+              />
               <h2
-                className="text-2xl font-bold"
+                className="text-lg sm:text-2xl font-bold truncate"
                 style={{ color: "var(--foreground)" }}
               >
                 Project Members
               </h2>
               <span
-                className="px-3 py-1 rounded-full text-sm font-medium"
+                className="px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium shrink-0"
                 style={{
                   background: "var(--primary)",
                   color: "#ffffff",
@@ -932,159 +942,211 @@ export default function ProjectDetailPage() {
                 {projectMembers.length}
               </span>
             </div>
-            <button
-              onClick={() => setShowMembersModal(!showMembersModal)}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all"
-              style={{
-                background: "var(--primary)",
-                color: "#ffffff",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.9")}
-              onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
-            >
-              <FiMail size={18} />
-              Invite Member
-            </button>
-          </div>
-
-          {/* Invite Form */}
-          {showMembersModal && (
-            <div
-              className="mb-4 p-4 rounded-lg"
-              style={{
-                background: "var(--input-bg)",
-                border: "1px solid var(--border)",
-              }}
-            >
-              <label
-                className="block text-sm font-medium mb-2"
-                style={{ color: "var(--foreground)" }}
-              >
-                Invite by Email
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="email"
-                  value={inviteEmail}
-                  onChange={(e) => setInviteEmail(e.target.value)}
-                  placeholder="user@example.com"
-                  className="flex-1 px-4 py-2 rounded-lg outline-none"
-                  style={{
-                    background: "var(--background)",
-                    color: "var(--foreground)",
-                    border: "1px solid var(--border)",
-                  }}
-                  onKeyPress={(e) => {
-                    if (e.key === "Enter") {
-                      sendInvitationToUser();
-                    }
-                  }}
-                />
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              {showMembersDropdown && (
                 <button
-                  onClick={sendInvitationToUser}
-                  disabled={sendingInvite}
-                  className="flex items-center gap-2 px-6 py-2 rounded-lg font-medium transition-all disabled:opacity-50"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowMembersModal(!showMembersModal);
+                  }}
+                  className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all"
                   style={{
-                    background: "var(--success)",
+                    background: "var(--primary)",
                     color: "#ffffff",
                   }}
-                  onMouseEnter={(e) =>
-                    !sendingInvite && (e.currentTarget.style.opacity = "0.9")
-                  }
+                  onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.9")}
                   onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
                 >
-                  <FiSend size={18} />
-                  {sendingInvite ? "Sending..." : "Send Invite"}
+                  <FiMail size={18} />
+                  Invite Member
                 </button>
-              </div>
-              <p className="text-xs mt-2" style={{ color: "var(--muted)" }}>
-                User will receive an email invitation to join this project
-              </p>
+              )}
+              {showMembersDropdown && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowMembersModal(!showMembersModal);
+                  }}
+                  className="sm:hidden p-2 rounded-lg transition-all"
+                  style={{
+                    background: "var(--primary)",
+                    color: "#ffffff",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.9")}
+                  onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+                  title="Invite Member"
+                >
+                  <FiMail size={18} />
+                </button>
+              )}
+              {showMembersDropdown ? (
+                <FiChevronUp
+                  size={20}
+                  className="sm:w-6 sm:h-6"
+                  style={{ color: "var(--muted)" }}
+                />
+              ) : (
+                <FiChevronDown
+                  size={20}
+                  className="sm:w-6 sm:h-6"
+                  style={{ color: "var(--muted)" }}
+                />
+              )}
             </div>
-          )}
+          </div>
 
-          {/* Members List */}
-          <div className="space-y-2">
-            {projectMembers.length === 0 ? (
-              <div className="text-center py-8">
-                <p style={{ color: "var(--muted)" }}>
-                  No members yet. Invite someone to get started!
-                </p>
-              </div>
-            ) : (
-              projectMembers.map((member) => (
+          {/* Dropdown Content */}
+          {showMembersDropdown && (
+            <>
+              {/* Invite Form */}
+              {showMembersModal && (
                 <div
-                  key={member._id}
-                  className="flex items-center gap-3 p-3 rounded-lg transition-all"
+                  className="mt-4 mb-4 p-3 sm:p-4 rounded-lg"
                   style={{
                     background: "var(--input-bg)",
                     border: "1px solid var(--border)",
                   }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.background = "var(--card-hover)")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.background = "var(--input-bg)")
-                  }
                 >
-                  {member.image && (
-                    <img
-                      src={member.image}
-                      alt={member.name || member.email}
-                      className="w-10 h-10 rounded-full"
-                    />
-                  )}
-                  <div className="flex-1">
-                    <p
-                      className="font-medium"
-                      style={{ color: "var(--foreground)" }}
-                    >
-                      {member.name || member.email}
-                    </p>
-                    {member.name && (
-                      <p className="text-sm" style={{ color: "var(--muted)" }}>
-                        {member.email}
-                      </p>
-                    )}
-                  </div>
-                  {project.userId === member.email ? (
-                    <span
-                      className="px-3 py-1 rounded-full text-xs font-medium"
+                  <label
+                    className="block text-sm font-medium mb-2"
+                    style={{ color: "var(--foreground)" }}
+                  >
+                    Invite by Email
+                  </label>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input
+                      type="email"
+                      value={inviteEmail}
+                      onChange={(e) => setInviteEmail(e.target.value)}
+                      placeholder="user@example.com"
+                      className="flex-1 px-3 sm:px-4 py-2 rounded-lg outline-none text-sm sm:text-base"
                       style={{
-                        background: "var(--primary)",
+                        background: "var(--background)",
+                        color: "var(--foreground)",
+                        border: "1px solid var(--border)",
+                      }}
+                      onKeyPress={(e) => {
+                        if (e.key === "Enter") {
+                          sendInvitationToUser();
+                        }
+                      }}
+                    />
+                    <button
+                      onClick={sendInvitationToUser}
+                      disabled={sendingInvite}
+                      className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2 rounded-lg font-medium transition-all disabled:opacity-50 text-sm sm:text-base"
+                      style={{
+                        background: "var(--success)",
                         color: "#ffffff",
                       }}
+                      onMouseEnter={(e) =>
+                        !sendingInvite &&
+                        (e.currentTarget.style.opacity = "0.9")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.opacity = "1")
+                      }
                     >
-                      Owner
-                    </span>
-                  ) : (
-                    // Show remove button only if current user is the owner
-                    session?.user?.email === project.userId && (
-                      <button
-                        onClick={() => handleRemoveMember(member.email)}
-                        className="p-2 rounded-lg transition-all"
-                        style={{
-                          color: "var(--error)",
-                          border: "1px solid var(--error)",
-                          background: "transparent",
-                        }}
-                        onMouseEnter={(e) =>
-                          (e.currentTarget.style.background =
-                            "rgba(220, 38, 38, 0.1)")
-                        }
-                        onMouseLeave={(e) =>
-                          (e.currentTarget.style.background = "transparent")
-                        }
-                        title="Remove member"
-                      >
-                        <FiTrash2 size={16} />
-                      </button>
-                    )
-                  )}
+                      <FiSend size={16} className="sm:w-[18px] sm:h-[18px]" />
+                      {sendingInvite ? "Sending..." : "Send Invite"}
+                    </button>
+                  </div>
+                  <p className="text-xs mt-2" style={{ color: "var(--muted)" }}>
+                    User will receive an email invitation to join this project
+                  </p>
                 </div>
-              ))
-            )}
-          </div>
+              )}
+
+              {/* Members List */}
+              <div className="space-y-2 mt-4">
+                {projectMembers.length === 0 ? (
+                  <div className="text-center py-6 sm:py-8">
+                    <p
+                      className="text-sm sm:text-base"
+                      style={{ color: "var(--muted)" }}
+                    >
+                      No members yet. Invite someone to get started!
+                    </p>
+                  </div>
+                ) : (
+                  projectMembers.map((member) => (
+                    <div
+                      key={member._id}
+                      className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg transition-all"
+                      style={{
+                        background: "var(--input-bg)",
+                        border: "1px solid var(--border)",
+                      }}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.background = "var(--card-hover)")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.background = "var(--input-bg)")
+                      }
+                    >
+                      {member.image && (
+                        <img
+                          src={member.image}
+                          alt={member.name || member.email}
+                          className="w-8 h-8 sm:w-10 sm:h-10 rounded-full shrink-0"
+                        />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p
+                          className="font-medium text-sm sm:text-base truncate"
+                          style={{ color: "var(--foreground)" }}
+                        >
+                          {member.name || member.email}
+                        </p>
+                        {member.name && (
+                          <p
+                            className="text-xs sm:text-sm truncate"
+                            style={{ color: "var(--muted)" }}
+                          >
+                            {member.email}
+                          </p>
+                        )}
+                      </div>
+                      {project.userId === member.email ? (
+                        <span
+                          className="px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs font-medium shrink-0"
+                          style={{
+                            background: "var(--primary)",
+                            color: "#ffffff",
+                          }}
+                        >
+                          Owner
+                        </span>
+                      ) : (
+                        // Show remove button only if current user is the owner
+                        session?.user?.email === project.userId && (
+                          <button
+                            onClick={() => handleRemoveMember(member.email)}
+                            className="p-1.5 sm:p-2 rounded-lg transition-all shrink-0"
+                            style={{
+                              color: "var(--error)",
+                              border: "1px solid var(--error)",
+                              background: "transparent",
+                            }}
+                            onMouseEnter={(e) =>
+                              (e.currentTarget.style.background =
+                                "rgba(220, 38, 38, 0.1)")
+                            }
+                            onMouseLeave={(e) =>
+                              (e.currentTarget.style.background = "transparent")
+                            }
+                            title="Remove member"
+                          >
+                            <FiTrash2 size={14} className="sm:w-4 sm:h-4" />
+                          </button>
+                        )
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            </>
+          )}
         </div>
 
         {/* Subgroups */}
