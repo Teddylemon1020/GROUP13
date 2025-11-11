@@ -672,12 +672,16 @@ export default function ProjectDetailPage() {
         const errorData = await response.json();
         if (errorData.error === "User is already a member of this project") {
           alert("This user is already a member of this project");
-        } else if (errorData.error === "An invitation has already been sent to this user") {
+        } else if (
+          errorData.error === "An invitation has already been sent to this user"
+        ) {
           alert("An invitation has already been sent to this user");
         } else if (errorData.error === "User not found") {
           alert("No user found with this email address");
         } else {
-          alert(`Failed to send invitation: ${errorData.error || 'Unknown error'}`);
+          alert(
+            `Failed to send invitation: ${errorData.error || "Unknown error"}`
+          );
         }
       }
     } catch (error) {
@@ -689,14 +693,21 @@ export default function ProjectDetailPage() {
   };
 
   const handleRemoveMember = async (userEmail: string) => {
-    if (!confirm(`Are you sure you want to remove this member from the project?`)) {
+    if (
+      !confirm(`Are you sure you want to remove this member from the project?`)
+    ) {
       return;
     }
 
     try {
-      const response = await fetch(`/api/projects/${projectId}/members?userEmail=${encodeURIComponent(userEmail)}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `/api/projects/${projectId}/members?userEmail=${encodeURIComponent(
+          userEmail
+        )}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (response.ok) {
         alert("Member removed successfully!");
@@ -704,7 +715,7 @@ export default function ProjectDetailPage() {
         await fetchProject();
       } else {
         const errorData = await response.json();
-        alert(`Failed to remove member: ${errorData.error || 'Unknown error'}`);
+        alert(`Failed to remove member: ${errorData.error || "Unknown error"}`);
       }
     } catch (error) {
       console.error("Error removing member:", error);
