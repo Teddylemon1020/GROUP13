@@ -1,6 +1,6 @@
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import clientPromise from "@/utils/mongodbclient";
-import NextAuth, { AuthOptions } from "next-auth";
+import NextAuth, { AuthOptions, Session, Account, Profile } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { JWT } from "next-auth/jwt";
 
@@ -27,16 +27,16 @@ export const authOptions: AuthOptions = {
     signIn: "/signup",
   },
   callbacks: {
-    async jwt({ token, account, profile }: { token: JWT; account: any; profile?: any }) {
+    async jwt({ token, account, profile }: { token: JWT; account: Account | null; profile?: Profile }) {
       if (account && profile) {
         token.accessToken = account.access_token;
         token.id = profile.sub;
       }
       return token;
     },
-    async session({ session, token }: { session: any; token: JWT }) {
+    async session({ session, token }: { session: Session; token: JWT }) {
       if (session.user) {
-        session.user.id = token.id;
+        session.user.id = token.id as string;
       }
       return session;
     },

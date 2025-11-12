@@ -5,7 +5,7 @@ import connectDB from "@/utils/mongodb";
 import Invitation from "@/models/invitationmodel";
 
 // GET /api/invitations - Get all invitations for the logged-in user
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
