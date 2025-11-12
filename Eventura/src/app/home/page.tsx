@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { FiPlus, FiFolder, FiLogOut, FiTrash2, FiMail } from "react-icons/fi";
-import ThemeToggle from "@/components/ThemeToggle";
 
 interface IProject {
   _id: string;
@@ -239,12 +238,11 @@ export default function HomePage() {
                 <FiLogOut size={20} />
                 <span className="font-medium">Sign Out</span>
               </button>
-              <ThemeToggle />
             </div>
           </div>
 
           {/* Mobile buttons - Grid layout */}
-          <div className="grid grid-cols-3 gap-2 sm:hidden mt-4">
+          <div className="grid grid-cols-2 gap-2 sm:hidden mt-4">
             <button
               onClick={() => router.push("/invitations")}
               className="flex flex-col items-center justify-center gap-1.5 px-3 py-3 rounded-xl transition-all duration-200 active:scale-95 relative"
@@ -280,9 +278,6 @@ export default function HomePage() {
               <FiLogOut size={20} />
               <span className="text-xs font-medium">Sign Out</span>
             </button>
-            <div className="flex items-center justify-center">
-              <ThemeToggle />
-            </div>
           </div>
         </div>
 
