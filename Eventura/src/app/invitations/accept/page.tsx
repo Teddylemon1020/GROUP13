@@ -85,7 +85,7 @@ export default function AcceptInvitationPage() {
         const data = await response.json();
         if (action === "accept") {
           alert(`Successfully joined ${data.project?.name || "the project"}!`);
-          router.push(`/projects/${invitation.projectId}`);
+          router.push(`/projects/${invitation?.projectId || data.project?._id || ""}`);
         } else {
           alert("Invitation declined");
           router.push("/home");
