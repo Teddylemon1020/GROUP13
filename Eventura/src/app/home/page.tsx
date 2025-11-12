@@ -12,6 +12,19 @@ interface IProject {
   updatedAt: Date;
 }
 
+interface IInvitation {
+  _id: string;
+  projectId: string;
+  projectName: string;
+  inviterEmail: string;
+  inviterName?: string;
+  inviteeEmail: string;
+  status: "pending" | "accepted" | "rejected";
+  token: string;
+  expiresAt: string;
+  createdAt: string;
+}
+
 export default function HomePage() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -38,7 +51,7 @@ export default function HomePage() {
       if (response.ok) {
         const data = await response.json();
         const pending = data.invitations.filter(
-          (inv: any) => inv.status === "pending"
+          (inv: IInvitation) => inv.status === "pending"
         );
         setPendingInvitationsCount(pending.length);
       }
