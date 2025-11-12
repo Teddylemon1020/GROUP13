@@ -28,8 +28,6 @@ export default function ThemeToggle() {
   const themeIcons: Record<ThemeName, string> = {
     default: '☀️',
     dark: '🌙',
-    ocean: '🌊',
-    forest: '🌲',
     custom: '🎨',
   };
 
