@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { FiPlus, FiFolder, FiLogOut, FiTrash2, FiMail } from "react-icons/fi";
+import ThemeToggle from "@/components/ThemeToggle";
 
 interface IProject {
   _id: string;
@@ -173,42 +174,91 @@ export default function HomePage() {
     >
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
-        <div className="flex items-center justify-between mb-10">
-          <div>
-            <h1
-              className="text-5xl font-bold"
-              style={{ color: "var(--primary)" }}
-            >
-              My Projects
-            </h1>
-            <p className="mt-3 text-lg" style={{ color: "var(--muted)" }}>
-              Welcome back,{" "}
-              <span style={{ color: "var(--primary)", fontWeight: "600" }}>
-                {session?.user?.name || "User"}
-              </span>
-            </p>
+        <div className="mb-6 sm:mb-10">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0 mb-4 sm:mb-0">
+            <div>
+              <h1
+                className="text-3xl sm:text-5xl font-bold"
+                style={{ color: "var(--primary)" }}
+              >
+                My Projects
+              </h1>
+              <p className="mt-2 sm:mt-3 text-base sm:text-lg" style={{ color: "var(--muted)" }}>
+                Welcome back,{" "}
+                <span style={{ color: "var(--primary)", fontWeight: "600" }}>
+                  {session?.user?.name || "User"}
+                </span>
+              </p>
+            </div>
+            {/* Desktop buttons */}
+            <div className="hidden sm:flex items-center gap-3">
+              <button
+                onClick={() => router.push("/invitations")}
+                className="flex items-center gap-2 px-5 py-3 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95 relative"
+                style={{
+                  color: "var(--primary)",
+                  border: "1px solid var(--primary)",
+                  background: "transparent",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.background = "rgba(79, 70, 229, 0.1)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.background = "transparent")
+                }
+              >
+                <FiMail size={20} />
+                <span className="font-medium">Invitations</span>
+                {pendingInvitationsCount > 0 && (
+                  <span
+                    className="absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
+                    style={{
+                      background: "var(--error)",
+                      color: "#ffffff",
+                    }}
+                  >
+                    {pendingInvitationsCount}
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={() => signOut({ callbackUrl: "/" })}
+                className="flex items-center gap-2 px-5 py-3 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95"
+                style={{
+                  color: "var(--error)",
+                  border: "1px solid var(--error)",
+                  background: "transparent",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.background = "rgba(220, 38, 38, 0.1)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.background = "transparent")
+                }
+              >
+                <FiLogOut size={20} />
+                <span className="font-medium">Sign Out</span>
+              </button>
+              <ThemeToggle />
+            </div>
           </div>
-          <div className="flex items-center gap-3">
+
+          {/* Mobile buttons - Grid layout */}
+          <div className="grid grid-cols-3 gap-2 sm:hidden mt-4">
             <button
               onClick={() => router.push("/invitations")}
-              className="flex items-center gap-2 px-5 py-3 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95 relative"
+              className="flex flex-col items-center justify-center gap-1.5 px-3 py-3 rounded-xl transition-all duration-200 active:scale-95 relative"
               style={{
                 color: "var(--primary)",
                 border: "1px solid var(--primary)",
                 background: "transparent",
               }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.background = "rgba(79, 70, 229, 0.1)")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.background = "transparent")
-              }
             >
               <FiMail size={20} />
-              <span className="font-medium">Invitations</span>
+              <span className="text-xs font-medium">Invitations</span>
               {pendingInvitationsCount > 0 && (
                 <span
-                  className="absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
+                  className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold"
                   style={{
                     background: "var(--error)",
                     color: "#ffffff",
@@ -220,22 +270,19 @@ export default function HomePage() {
             </button>
             <button
               onClick={() => signOut({ callbackUrl: "/" })}
-              className="flex items-center gap-2 px-5 py-3 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95"
+              className="flex flex-col items-center justify-center gap-1.5 px-3 py-3 rounded-xl transition-all duration-200 active:scale-95"
               style={{
                 color: "var(--error)",
                 border: "1px solid var(--error)",
                 background: "transparent",
               }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.background = "rgba(220, 38, 38, 0.1)")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.background = "transparent")
-              }
             >
               <FiLogOut size={20} />
-              <span className="font-medium">Sign Out</span>
+              <span className="text-xs font-medium">Sign Out</span>
             </button>
+            <div className="flex items-center justify-center">
+              <ThemeToggle />
+            </div>
           </div>
         </div>
 

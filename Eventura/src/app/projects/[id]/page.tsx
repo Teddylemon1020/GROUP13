@@ -1157,54 +1157,58 @@ export default function ProjectDetailPage() {
               {/* Subgroup Header */}
               <div className="flex items-center justify-between mb-4 sm:mb-6 gap-2">
                 {editingSubgroupId === subgroup.id ? (
-                  <div className="flex items-center gap-2 sm:gap-3 flex-1">
-                    <input
-                      type="text"
-                      value={editingSubgroupTitle}
-                      onChange={(e) => setEditingSubgroupTitle(e.target.value)}
-                      className="text-xl sm:text-2xl md:text-3xl font-bold border-b-2 bg-transparent outline-none"
-                      style={{
-                        borderColor: "var(--primary)",
-                        color: "var(--foreground)",
-                      }}
-                      autoFocus
-                    />
-                    <button
-                      onClick={() => handleSaveSubgroupTitle(subgroup.id)}
-                      className="p-2 rounded-lg transition-all shrink-0"
-                      style={{
-                        color: "var(--success)",
-                        border: "1px solid var(--success)",
-                        background: "transparent",
-                      }}
-                      onMouseEnter={(e) =>
-                        (e.currentTarget.style.background =
-                          "rgba(5, 150, 105, 0.1)")
-                      }
-                      onMouseLeave={(e) =>
-                        (e.currentTarget.style.background = "transparent")
-                      }
-                    >
-                      <FiSave size={16} className="sm:w-5 sm:h-5" />
-                    </button>
-                    <button
-                      onClick={() => setEditingSubgroupId(null)}
-                      className="p-2 rounded-lg transition-all shrink-0"
-                      style={{
-                        color: "var(--error)",
-                        border: "1px solid var(--error)",
-                        background: "transparent",
-                      }}
-                      onMouseEnter={(e) =>
-                        (e.currentTarget.style.background =
-                          "rgba(220, 38, 38, 0.1)")
-                      }
-                      onMouseLeave={(e) =>
-                        (e.currentTarget.style.background = "transparent")
-                      }
-                    >
-                      <FiX size={16} className="sm:w-5 sm:h-5" />
-                    </button>
+                  <div className="flex-1">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+                      <input
+                        type="text"
+                        value={editingSubgroupTitle}
+                        onChange={(e) => setEditingSubgroupTitle(e.target.value)}
+                        className="flex-1 text-xl sm:text-2xl md:text-3xl font-bold border-b-2 bg-transparent outline-none"
+                        style={{
+                          borderColor: "var(--primary)",
+                          color: "var(--foreground)",
+                        }}
+                        autoFocus
+                      />
+                      <div className="grid grid-cols-2 sm:flex gap-2">
+                        <button
+                          onClick={() => handleSaveSubgroupTitle(subgroup.id)}
+                          className="p-2 rounded-lg transition-all shrink-0"
+                          style={{
+                            color: "var(--success)",
+                            border: "1px solid var(--success)",
+                            background: "transparent",
+                          }}
+                          onMouseEnter={(e) =>
+                            (e.currentTarget.style.background =
+                              "rgba(5, 150, 105, 0.1)")
+                          }
+                          onMouseLeave={(e) =>
+                            (e.currentTarget.style.background = "transparent")
+                          }
+                        >
+                          <FiSave size={16} className="sm:w-5 sm:h-5" />
+                        </button>
+                        <button
+                          onClick={() => setEditingSubgroupId(null)}
+                          className="p-2 rounded-lg transition-all shrink-0"
+                          style={{
+                            color: "var(--error)",
+                            border: "1px solid var(--error)",
+                            background: "transparent",
+                          }}
+                          onMouseEnter={(e) =>
+                            (e.currentTarget.style.background =
+                              "rgba(220, 38, 38, 0.1)")
+                          }
+                          onMouseLeave={(e) =>
+                            (e.currentTarget.style.background = "transparent")
+                          }
+                        >
+                          <FiX size={16} className="sm:w-5 sm:h-5" />
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 ) : (
                   <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
