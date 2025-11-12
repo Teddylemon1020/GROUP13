@@ -369,11 +369,11 @@ export default function HomePage() {
                     "0 10px 15px -3px var(--shadow)";
                 }}
               >
-                {/* Delete Button - appears on hover */}
+                {/* Delete Button - always visible on mobile, appears on hover on desktop */}
                 <button
                   onClick={(e) => handleDeleteProject(project._id, e)}
                   disabled={deletingProjectId === project._id}
-                  className="absolute top-4 right-4 p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-all disabled:opacity-50 z-10"
+                  className="absolute top-4 right-4 p-2 rounded-lg opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all disabled:opacity-50 z-10"
                   title="Delete project"
                   style={{
                     color: "var(--muted)",
