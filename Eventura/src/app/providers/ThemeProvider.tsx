@@ -39,7 +39,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       try {
         const parsedColors = JSON.parse(savedCustomColors);
         setCustomColorsState(parsedColors);
-      } catch (e) {
+      } catch {
         console.error('Failed to parse custom colors');
       }
     }
@@ -89,6 +89,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       applyTheme(currentTheme);
     }
     localStorage.setItem('theme', currentTheme);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentTheme, mounted]);
 
   // Apply custom colors when they change

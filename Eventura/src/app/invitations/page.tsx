@@ -259,7 +259,7 @@ export default function InvitationsPage() {
               No pending invitations
             </h3>
             <p style={{ color: "var(--muted)" }}>
-              You don't have any pending project invitations at the moment.
+              You don&apos;t have any pending project invitations at the moment.
             </p>
           </div>
         )}

@@ -2,11 +2,9 @@
 //this is use to help build and understand the programs
 
 "use client";
-import React, { useState } from "react";
+import React from "react";
 
 export default function DemoContainersPage() {
-  const [showPopup, setShowPopup] = useState(false);
-
   return (
     <main className="min-h-screen flex items-center justify-center bg-blue-900 p-6">
       <div className="w-full max-w-5xl border border-gray-300 rounded-xl p-6 bg-white shadow-md relative">

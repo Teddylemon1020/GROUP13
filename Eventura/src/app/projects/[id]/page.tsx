@@ -148,7 +148,7 @@ function StatusDropdown({
               <button
                 key={option.value}
                 onClick={() => {
-                  onChange(option.value as any);
+                  onChange(option.value as "" | "todo" | "in-progress" | "done");
                   setIsOpen(false);
                 }}
                 className="w-full text-left px-2 py-1.5 transition-colors"
@@ -273,7 +273,7 @@ function PriorityDropdown({
               <button
                 key={option.value}
                 onClick={() => {
-                  onChange(option.value as any);
+                  onChange(option.value as "" | "high" | "medium" | "low");
                   setIsOpen(false);
                 }}
                 className="w-full text-left px-2 py-1.5 transition-colors"
@@ -364,6 +364,7 @@ function AssignedToDropdown({
         {selectedUser ? (
           <>
             {selectedUser.image && (
+              // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={selectedUser.image}
                 alt={selectedUser.name || selectedUser.email}
@@ -427,6 +428,7 @@ function AssignedToDropdown({
                 }
               >
                 {user.image && (
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={user.image}
                     alt={user.name || user.email}
@@ -472,7 +474,6 @@ export default function ProjectDetailPage() {
     null
   );
   const [editingSubgroupTitle, setEditingSubgroupTitle] = useState("");
-  const [allUsers, setAllUsers] = useState<IUser[]>([]);
   const [projectMembers, setProjectMembers] = useState<IUser[]>([]);
   const [showMembersModal, setShowMembersModal] = useState(false);
   const [showMembersDropdown, setShowMembersDropdown] = useState(false);
@@ -487,7 +488,6 @@ export default function ProjectDetailPage() {
   // Fetch project data and users
   useEffect(() => {
     fetchProject();
-    fetchAllUsers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId]);
 
@@ -509,20 +509,6 @@ export default function ProjectDetailPage() {
       console.error("Error fetching project:", error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchAllUsers = async () => {
-    try {
-      const response = await fetch("/api/users");
-      if (response.ok) {
-        const data = await response.json();
-        setAllUsers(data.users || []);
-      } else {
-        console.error("Failed to fetch users");
-      }
-    } catch (error) {
-      console.error("Error fetching users:", error);
     }
   };
 
@@ -1085,6 +1071,7 @@ export default function ProjectDetailPage() {
                       }
                     >
                       {member.image && (
+                        // eslint-disable-next-line @next/next/no-img-element
                         <img
                           src={member.image}
                           alt={member.name || member.email}

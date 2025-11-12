@@ -1,8 +1,21 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FiMail, FiCheck, FiX, FiAlertCircle } from "react-icons/fi";
+
+interface IInvitation {
+  _id: string;
+  projectId: string;
+  projectName: string;
+  inviterEmail: string;
+  inviterName?: string;
+  inviteeEmail: string;
+  status: "pending" | "accepted" | "rejected";
+  token: string;
+  expiresAt: string;
+  createdAt: string;
+}
 
 export default function AcceptInvitationPage() {
   const router = useRouter();
@@ -10,26 +23,16 @@ export default function AcceptInvitationPage() {
   const token = searchParams.get("token");
 
   const [loading, setLoading] = useState(true);
-  const [invitation, setInvitation] = useState<any>(null);
+  const [invitation, setInvitation] = useState<IInvitation | null>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!token) {
-      setError("Invalid invitation link");
-      setLoading(false);
-      return;
-    }
-
-    fetchInvitation();
-  }, [token]);
-
-  const fetchInvitation = async () => {
+  const fetchInvitation = useCallback(async () => {
     try {
       const response = await fetch("/api/invitations");
       if (response.ok) {
         const data = await response.json();
-        const inv = data.invitations.find((i: any) => i.token === token);
+        const inv = data.invitations.find((i: IInvitation) => i.token === token);
 
         if (inv) {
           setInvitation(inv);
@@ -55,7 +58,17 @@ export default function AcceptInvitationPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
+
+  useEffect(() => {
+    if (!token) {
+      setError("Invalid invitation link");
+      setLoading(false);
+      return;
+    }
+
+    fetchInvitation();
+  }, [token, fetchInvitation]);
 
   const handleRespond = async (action: "accept" | "reject") => {
     if (!token) return;
@@ -190,7 +203,7 @@ export default function AcceptInvitationPage() {
             className="text-3xl font-bold mb-2"
             style={{ color: "var(--primary)" }}
           >
-            You're Invited!
+            You&apos;re Invited!
           </h1>
         </div>
 

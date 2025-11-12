@@ -3,7 +3,6 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import connectDB from "@/utils/mongodb";
 import Project from "@/models/projectmodel";
-import User from "@/models/usermodel";
 import Invitation from "@/models/invitationmodel";
 import { sendInvitationEmail } from "@/utils/emailService";
 import crypto from "crypto";
