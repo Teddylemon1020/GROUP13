@@ -28,14 +28,14 @@ export const authOptions: AuthOptions = {
   },
   callbacks: {
     async jwt({ token, account, profile }: { token: JWT; account: Account | null; profile?: Profile }) {
-      if (account && profile) {
+      if (account && profile?.sub) {
         token.accessToken = account.access_token;
         token.id = profile.sub;
       }
       return token;
     },
     async session({ session, token }: { session: Session; token: JWT }) {
-      if (session.user) {
+      if (session.user && token.id) {
         session.user.id = token.id as string;
       }
       return session;
