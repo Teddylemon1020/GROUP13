@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import dbConnect from '@/utils/mongodb';
 import Project from '@/models/projectmodel';
 import User from '@/models/usermodel';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 
 // GET a single project by ID
 export async function GET(
